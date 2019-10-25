@@ -77,9 +77,9 @@ Nếu bạn sử dụng TCP có thể sử dụng lệnh
 
 > Lưu ý trên client cũng phải truyền đúng với giao thức như trên server
 
-*.*	@IPserver:514 - đối với giao thức UDP
+`*.*	@IPserver:514` - đối với giao thức UDP
 
-*.*	@@IPserver:514 - đối với giao thức TCP
+`*.*	@@IPserver:514` - đối với giao thức TCP
 
 - Đối với client CentOS 7
 
