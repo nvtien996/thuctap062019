@@ -36,19 +36,19 @@ bạn có thể lựa chọn sử dụng UDP hoặc TCP để cho phép server n
 
 Có 2 cách:
 
-	- C1: thư mục lưu log là ip-client
+C1: thư mục lưu log là ip-client
 	
-	```
-	$template RemoteServer, "/var/log/%fromhost-ip%/%SYSLOGFACILITY-TEXT%.log"
-	*.* ?RemoteServer
-	```
+```
+$template RemoteServer, "/var/log/%fromhost-ip%/%SYSLOGFACILITY-TEXT%.log"
+*.* ?RemoteServer
+```
 	
-	- C2: thư mục lưu log là host name client
+C2: thư mục lưu log là host name client
 	
-	```
-	$template RemoteServer, "/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
-	*.* ?RemoteServer
-	```
+```
+$template RemoteServer, "/var/log/%HOSTNAME%/%SYSLOGFACILITY-TEXT%.log"
+*.* ?RemoteServer
+```
 
 Ngoài ra bạn có thể sử dụng cấu hình sau để lưu các file log với tên các chương trình:
 
