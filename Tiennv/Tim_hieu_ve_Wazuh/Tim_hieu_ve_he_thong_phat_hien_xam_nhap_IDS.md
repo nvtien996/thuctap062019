@@ -52,23 +52,19 @@ IDS bao gồm các thành phần chính sau:
 
 - thành phần phản ứng
 
-Trong 3 thành phần này thì thành phần phân tích gói tin là quan trọng nhất và ở thành phần này bộ cảm biến đóng vai trò quyết định.
-
-Bê dưới là ảnh kiến trúc của 1 hệ thống IDS
+Bên dưới là ảnh kiến trúc của 1 hệ thống IDS
 
 <img src="img/03.png">
 
-Bộ cảm biến có thể là các chương trình chạy trên các thiết bị mạng hoặc máy chuyên dụng trên các đường mạng. Bộ cảm biến có 1 vai trò quan trong vì có rất nhiều mục tiêu cần được giám sát trên hệ thống mạng.
+Trong 3 thành phần này thì thành phần phân tích gói tin là quan trọng nhất và ở thành phần này bộ cảm biến đóng vai trò quyết định. Thành phần phân tích gói tin được kết nối trên mạng, không có địa chỉ IP, kiểm soát các luồng dữ liệu trên mạng và gửi cảnh báo khi phát hiện ra hành động xâm nhập.
 
-Bộ cảm biến được tích hợp với thành phần sưu tập dữ liệu thành 1 bộ tạo sự kiện. Bộ tạo sự kiện (hđh, mạng, ứng dụng) cung cấp một số chính sách thích hợp cho các sự kiện, có thể là 1 bản ghi các sự kiện của hệ thống hoặc các gói mạng. Vai trò của bộ cảm biến là dùng để lọc thông tin và loại bỏ dữ liệu không tương thích từ các sự kiện liên quan với hệ thống bảo vệ, vì vậy có thể phát hiện được các hành động đáng nghi ngờ.
+Bộ cảm biến có thể là các chương trình chạy trên các thiết bị mạng hoặc máy chuyên dụng trên các đường mạng. Bộ cảm biến có 1 vai trò quan trong vì có rất nhiều mục tiêu cần được giám sát trên hệ thống mạng, nó sẽ giám sát các traffic trên tất cả các cổng cũng như các thiết bị, phát hiện các traffic bất thường. Bộ cảm biến được tích hợp với thành phần sưu tập dữ liệu thành 1 bộ tạo sự kiện. Bộ tạo sự kiện (hđh, mạng, ứng dụng) cung cấp một số chính sách thích hợp cho các sự kiện, có thể là 1 bản ghi các sự kiện của hệ thống hoặc các gói mạng. Vai trò của bộ cảm biến là dùng để lọc thông tin và loại bỏ dữ liệu không tương thích từ các sự kiện liên quan với hệ thống bảo vệ, vì vậy có thể phát hiện được các hành động đáng nghi ngờ.
+
+Khi hệ thống mạng dùng các Hub, ta có thể đặt các bộ cảm biến trên bất kì cổng nào của Hub vì mọi luồng lưu lượng truy cập được gửi ra tất cả các cổng trên Hub, và có thể phát hiện ra các luồng truy cập bất thường. Nhưng khi hệ thống cần sử dụng các bộ chuyển mạch (switch), các switch này chỉ gửi gói tin đến chính xác địa chỉ cần gửi trên từng cổng. Để giải quyết vấn đề này, một kỹ thuật thông dụng là sử dụng những bộ chuyển mạch có cổng mở rộng (expansion port) và ta kết nối IDS vào cổng này. Cổng này được gọi là Switched Port Analyzer (SPAN) port. SPAN port cần được cấu hình bởi các chuyên gia bảo mật để nhân bản mọi luồng dữ liệu của switch. 
 
 Bộ phân tích sử dụng cơ sở dữ liệu chính sách phát hiện cho mục này. Ngoài ra, còn có các thành phần: dấu hiệu tấn công, các hồ sơ hành vi thông thường, các tham số cần thiết (ví dụ: các mức cảnh báo).
 
 Thêm vào đó, cơ sở dữ liệu giữ các tham số cấu hình, gồm có các chế độ truyền thông với module đáp trả. Bộ cảm biến cũng có cơ sở dữ liệu của riêng nó, gồm dữ liệu lưu về các xâm nhập phức tạp tiềm ẩn (tạo ra từ nhiều hành động khác nhau).
-
-Khi hệ thống mạng dùng các Hub, ta có thể đặt các bộ cảm biến trên bất kì cổng nào của Hub vì mọi luồng lưu lượng truy cập được gửi ra tất cả các cổng trên Hub, và có thể phát hiện ra các luồng truy cập bất thường. Nhưng khi hệ thống cần sử dụng các bộ chuyển mạch (switch), các switch này chỉ gửi gói tin đến chính xác địa chỉ cần gửi trên từng cổng. Để giải quyết vấn đề này, một kỹ thuật thông dụng là sử dụng những bộ chuyển mạch có cổng mở rộng (expansion port) và ta kết nối IDS vào cổng này. Cổng này được gọi là Switched Port Analyzer (SPAN) port. SPAN port cần được cấu hình bởi các chuyên gia bảo mật để nhân bản mọi luồng dữ liệu của switch. 
-
-Thành phần phân tích gói tin được kết nối trên mạng, không có địa chỉ IP, kiểm soát các luồng dữ liệu trên mạng và gửi cảnh báo khi phát hiện ra hành động xâm nhập. 
 
 Thành phần phản ứng có chức năng gửi những báo cáo, cảnh báo tới người quản trị. Trong các hệ thống IDS hiện đại, lời cảnh báo có thể ở dưới nhiều dạng như: cửa sổ pop-up, alarm, email, SNMP, …
 
@@ -185,3 +181,14 @@ HIDS không có khả năng phát hiện các cuộc dò quét mạng (ví dụ:
 HIDS cần tài nguyên trên host để hoạt động. 
 
 HIDS không hiệu quả khi bị tấn công DoS
+
+#### So sánh
+
+| NIDS | HIDS |
+| --- | --- |
+| Áp dụng trong phạm vi rộng (theo dõi toàn bộ hoạt động của mạng) | Áp dụng trong phạm vi một Host |
+| Phát hiện tốt những tấn công xâm nhập từ bên ngoài | Phát hiện tốt những tấn công, xâm nhập từ bên trong |
+| Phát hiện dựa trên các dữ liệu, thông tin thu nhập trong toàn bộ mạng | Phát hiện dựa trên thông tin, dữ liệu trên Host |
+| Độc lập với hệ điều hành | Phụ thuộc vào hệ điều hành trên Host đó |
+| Tiết kiệm kinh phí khi triển khai | Yêu cầu chi phí cao |
+| Dễ dàng cài đặt, triển khai |	Phức tạp khi cài đặt, triển khai |
