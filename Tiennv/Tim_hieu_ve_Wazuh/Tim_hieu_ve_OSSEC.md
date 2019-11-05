@@ -161,3 +161,229 @@ ví dụ:
 ví dụ:
 
 <img src="img/09.png">
+
+### Cài đặt OSSEC server và OSSEC agent
+
+> Chú ý: 1 điều cần lưu ý khi cài đặt OSSEC là hđh Windows chỉ hỗ trợ cài đặt OSSEC agent, nó không hỗ trợ cài đặt OSSEC server. OSSEC server chỉ được hỗ trợ cài đặt trên Linux/Unix
+
+- Tải gói cài đặt tại: https://www.ossec.net/downloads.html
+
+- Các gói yêu cầu:
+
+`sudo apt-get install build-essential`
+
+`yum groupinstall 'Development Tools'`
+
+`yum install openssl*`
+
+1. Cài đặt OSSEC server
+
+- CentOS 7
+
+Add Yum repo configuration:
+
+`wget -q -O - https://updates.atomicorp.com/installers/atomic | sudo bash`
+
+Install OSSEC Server:
+
+`sudo yum install ossec-hids-server`
+
+hoặc nếu muốn cài bằng tay
+
+Download file cài đặt:
+
+`wget https://github.com/ossec/ossec-hids/archive/3.3.0.tar.gz`
+
+Giải nén file:
+
+`tar -zxvf 3.3.0.tar.gz`
+
+Sau đó, cài đặt OSSEC server với câu lệnh:
+
+`./install.sh`
+
+Tiếp theo hướng dẫn.
+
+Đến đây đã cài đặt xong ossec server. Toàn bộ dữ liệu cài đặt được lưu trong /var/ossec. Để kiểm tra hoạt động của OSSEC, sử dụng câu lệnh:
+
+`/var/ossec/bin/ossec-control start`
+
+<img src="img/10.png">
+
+Trước khi chuyển sang cài đặt ossec agent trên client, cần đảm bảo rằng đã mở cổng 1514 hoặc 514. Để mở port UDP 1514 hoặc 514:
+
+```
+iptables -A INPUT -p UDP --dport 1514 -s YOUR_AGENT_IP -j ACCEPT
+service iptables save
+```
+
+hoặc nếu dùng firewalld:
+
+```
+firewall-cmd --permanent --zone=public --add-port=1514/udp
+firewall-cmd --reload
+```
+
+- Ubuntu  16
+
+Add Apt sources.lst:
+
+`wget -q -O - https://updates.atomicorp.com/installers/atomic | sudo bash`
+
+Update apt data:
+
+`sudo apt-get update`
+
+Install OSSEC server
+
+`sudo apt-get install ossec-hids-server`
+
+hoặc nếu muốn cài bằng tay
+
+Add the GPG key:
+
+`wget -q -O - https://www.atomicorp.com/RPM-GPG-KEY.atomicorp.txt  | sudo apt-key add -`
+
+Add repo configuration vào sources.list:
+
+source /etc/lsb-release
+
+`echo "deb https://updates.atomicorp.com/channels/atomic/ubuntu $DISTRIB_CODENAME main" >>  /etc/apt/sources.list.d/atomic.list`
+
+Update apt data:
+
+`sudo apt-get update`
+
+Install OSSEC server:
+
+`sudo apt-get install ossec-hids-server`
+
+2. Cài đặt OSSEC agent
+
+- Với CentOS và Ubuntu, chỉ cần đổi câu lệnh sau
+
+CentOS: `sudo yum install ossec-hids-agent`
+
+Ubuntu: `sudo apt-get install ossec-hids-agent`
+
+- Cũng tương tự như trên server cần mở port UPD 1514, 514 trên agent.
+
+3. Cài đặt trên Windows
+
+- Tải gói cài đặt agent cho windows trên trang chủ của ossec.
+
+- Tiến hành cài đặt như bình thường:
+
+<img src="img/11.png">
+
+<img src="img/12.png">
+
+<img src="img/13.png">
+
+<img src="img/14.png">
+
+<img src="img/15.png">
+
+<img src="img/16.png">
+
+<img src="img/17.png">
+
+4. Định cấu hình OSSEC server
+
+Ở bước này, ta sẽ cấu hình máy chủ để đảm bảo rằng nó có thể gửi thông báo.
+
+Ta sẽ định cấu hình cài đặt email của máy chủ OSSEC và đảm bảo rằng nó có thể gửi thông báo đến email được chỉ định. Để truy cập và sửa đổi các tệp và thư mục của OSSEC, bạn cần chuyển sang người dùng root.
+
+Sau khi login vào root, `cd` vào thư mục chứa tệp cấu hình của OSSEC:
+
+`cd /var/ossec/etc`
+
+Các tập tin cấu hình là `ossec.conf`. Đầu tiên, tạo một bản sao lưu:
+
+`cp ossec.conf ossec.conf.00`
+
+Sau đó mở bản gốc:
+
+`vi ossec.conf`
+
+Các cài đặt email nằm ở đầu tệp:
+
+<img src="img/18.png">
+
+trong đó:
+
+<email_to>: Cảnh báo sẽ được gửi đến địa chỉ email đó
+
+<email_from>: là nơi cảnh báo của OSSEC phát ra. Thay đổi địa chỉ đó thành một địa chỉ email hợp lệ để giảm tỷ lệ email của bạn bị gắn thẻ là thư rác bởi máy chủ SMTP của nhà cung cấp email.
+
+Nếu bạn có máy chủ email của riêng mình và trên cùng một máy chủ với máy chủ OSSEC được cài đặt trên đó, bạn có thể thay đổi cài đặt <smtp_server> thành localhost.
+
+Theo mặc định, OSSEC gửi 12 email mỗi giờ, bạn có thể tăng hoặc giảm giá trị đó bằng cách thêm cài đặt vào phần đó: <email_maxperhour>N</email_maxperhour>. Thay thế `N` bằng số lượng email bạn muốn nhận mỗi giờ, trong khoảng từ 1 đến 9999.
+
+Sau khi sửa đổi cài đặt email, lưu và đóng tệp. Sau đó bắt đầu OSSEC:
+
+`/var/ossec/bin/ossec-control start`
+
+Nếu bạn vẫn không nhận được email dự kiến ​​từ OSSEC, hãy kiểm tra nhật ký /var/ossec/logs/ossec.log để biết lỗi.
+
+5. Thêm agent vào server
+
+Để OSSEC Server và OSSEC Agent có thể giao tiếp với nhau, phía agent cần xác minh với OSSEC Server. Traffic giữa OSSEC Server và OSSEC Agent được mã hóa sử dụng khóa bí mật do phía server sinh, sau đó được imported cho agent.
+
+Quy trình (chạy với quyền root):
+
+- Chạy manage agent trên máy chủ OSSEC:
+
+`/var/ossec/bin/manage_agents`
+
+<img src="img/19.png">
+
+- Thêm agent:
+
+Chọn tùy chọn `A` để add agent:
+
+<img src="img/20.png">
+
+Sau đó, điền các thông tin cho agent (tên agent, địa chỉ ip, id agent):
+
+<img src="img/21.png">
+
+- Giải nén khóa cho agent:
+
+Chọn tùy chọn `E` để tạo 1 khóa cho agent
+
+<img src="img/22.png">
+
+Nhập id agent muốn tạo khóa, sau đó khóa sẽ tự động được tạo
+
+- Sao chép khóa đó vào agent:
+
+Trên agent, nhập:
+
+`/var/ossec/bin/manage_agent`
+
+Chọn tùy chọn `I` để import key
+
+<img src="img/23.png">
+
+Nhập key đã tạo trên server và xác nhận thông tin của agent
+
+<img src="img/24.png">
+
+Start OSSEC Agent:
+
+`/var/ossec/bin/ossec-control start`
+
+output sẽ như sau:
+
+<img src="img/25.png">
+
+Restart OSSEC Server:
+
+`/var/ossec/bin/ossec-control restart`
+
+Kiểm tra agent với câu lệnh sau trên server:
+
+`/var/ossec/bin/list_agents -c`
+
+<img src="img/26.png">
