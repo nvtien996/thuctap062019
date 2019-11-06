@@ -170,13 +170,43 @@ ví dụ:
 
 - Các gói yêu cầu:
 
-`sudo apt-get install build-essential`
+`apt-get install build-essential`
+
+`apt-get install mysql-dev`
 
 `yum groupinstall 'Development Tools'`
 
 `yum install openssl*`
 
-1. Cài đặt OSSEC server
+`yum update`
+
+`yum install mysql-devel`
+
+`yum install git`
+
+1. Cài đặt MySQL server
+
+-  Tải xuống repo
+
+Mở 1 cửa sổ trình duyệt và đi đến địa chỉ sau:
+
+https://dev.mysql.com/downloads/repo/yum/
+
+Trang này sẽ liệt kê chi tiết về kho lưu trữ Yum chứa các tệp MySQL. Cuộn xuống để tìm phiên bản Red Hat Enterprise Linux mà bạn muốn tải xuống, ở đây tôi dùng bản 7.
+
+Nhập lệnh sau để tải về gói rpm:
+
+`wget https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm`
+
+- Cài đặt gói:
+
+`rpm -ivh mysql80-community-release-el7-3.noarch.rpm`
+
+- Cài đặt MySQL server:
+
+`yum install mysql-community-server`
+
+2. Cài đặt OSSEC server
 
 - CentOS 7
 
@@ -198,11 +228,35 @@ Giải nén file:
 
 `tar -zxvf 3.3.0.tar.gz`
 
-Sau đó, cài đặt OSSEC server với câu lệnh:
+Vì OSSEC yêu cầu pcre2 10.32 để cài đặt nên ta cần download gói về, giải nén và copy vào thư mục /src/external trong thư mục ossec-hids-3.3.0
+
+`wget ftp://ftp.pcre.org/pub/pcre/pcre2-10.32.tar.gz`
+
+giải nén file:
+
+`tar -zxvf pcre2-10.32.tar.gz`
+
+copy vào thư mục /src/external trong thư mục ossec-hids-3.3.0
+
+`mv pcre2-10.32 ossec-hids-3.3.0/src/external`
+
+Sau đó, chạy lệnh sau để config OSSEC server nhận database MySQL:
+
+`env DATABASE=mysql`
+
+Di chuyển vào thư mục ossec-hids-3.3.0 đã giải nén:
+
+`cd ossec-hids-3.3.0`
+
+Cài đặt OSSEC server với câu lệnh:
 
 `./install.sh`
 
 Tiếp theo hướng dẫn.
+
+Enable Database output:
+
+`/var/ossec/bin/ossec-control enable database`
 
 Đến đây đã cài đặt xong ossec server. Toàn bộ dữ liệu cài đặt được lưu trong /var/ossec. Để kiểm tra hoạt động của OSSEC, sử dụng câu lệnh:
 
@@ -258,7 +312,9 @@ Install OSSEC server:
 
 `sudo apt-get install ossec-hids-server`
 
-2. Cài đặt OSSEC agent
+3. Cài đặt OSSEC agent
+
+> Lưu ý: Không cần cài đặt MySQL trên agent
 
 - Với CentOS và Ubuntu, chỉ cần đổi câu lệnh sau
 
@@ -266,9 +322,11 @@ CentOS: `sudo yum install ossec-hids-agent`
 
 Ubuntu: `sudo apt-get install ossec-hids-agent`
 
+- Cài bằng tay cũng tương tự như trên OSSEC server, chỉ cần chọn install agent là được
+
 - Cũng tương tự như trên server cần mở port UPD 1514, 514 trên agent.
 
-3. Cài đặt trên Windows
+4. Cài đặt trên Windows
 
 - Tải gói cài đặt agent cho windows trên trang chủ của ossec.
 
@@ -288,7 +346,7 @@ Ubuntu: `sudo apt-get install ossec-hids-agent`
 
 <img src="img/17.png">
 
-4. Định cấu hình OSSEC server
+5. Định cấu hình OSSEC server
 
 Ở bước này, ta sẽ cấu hình máy chủ để đảm bảo rằng nó có thể gửi thông báo.
 
@@ -326,7 +384,7 @@ Sau khi sửa đổi cài đặt email, lưu và đóng tệp. Sau đó bắt đ
 
 Nếu bạn vẫn không nhận được email dự kiến ​​từ OSSEC, hãy kiểm tra nhật ký /var/ossec/logs/ossec.log để biết lỗi.
 
-5. Thêm agent vào server
+6. Thêm agent vào server
 
 Để OSSEC Server và OSSEC Agent có thể giao tiếp với nhau, phía agent cần xác minh với OSSEC Server. Traffic giữa OSSEC Server và OSSEC Agent được mã hóa sử dụng khóa bí mật do phía server sinh, sau đó được imported cho agent.
 
@@ -360,7 +418,7 @@ Nhập id agent muốn tạo khóa, sau đó khóa sẽ tự động được t�
 
 Trên agent, nhập:
 
-`/var/ossec/bin/manage_agent`
+`/var/ossec/bin/manage_agents`
 
 Chọn tùy chọn `I` để import key
 
@@ -387,3 +445,140 @@ Kiểm tra agent với câu lệnh sau trên server:
 `/var/ossec/bin/list_agents -c`
 
 <img src="img/26.png">
+
+7. MySQL trên server
+
+Start MySQL:
+
+```
+systemctl enable mysqld
+systemctl start mysqld
+```
+
+Check status MySQL:
+
+`systemctl status mysqld`
+
+Khi máy chủ MySQL được khởi động lần đầu tiên, mật khẩu tạm thời được tạo cho người dùng root MySQL. Bạn có thể tìm thấy mật khẩu bằng cách chạy lệnh sau:
+
+`grep 'temporary password' /var/log/mysqld.log`
+
+Chạy lệnh sau để thực hiện một số tác vụ liên quan đến bảo mật:
+
+`mysql_secure_installation`
+
+Sau đó, bạn sẽ được nhắc thiết lập mật khẩu người dùng root (mật khẩu nên đáp ứng các yêu cầu như chữ hoa, chữ thường, số, ký tự đặc biệt ...), xóa tài khoản người dùng ẩn danh, hạn chế quyền truy cập của người dùng root vào máy cục bộ và xóa cơ sở dữ liệu kiểm tra.
+
+Các bước được giải thích chi tiết. Nên trả lời Y(có) cho tất cả các câu hỏi.
+
+Tiếp theo, đăng nhập vào máy chủ MySQL với root:
+
+`mysql -u root -p`
+
+Tạo một Mysql user và database cho ossec:
+
+```
+create database ossec;
+create user ossecuser@localhost identified by 'your_password';
+grant all privileges on ossec.* to ossecuser@localhost;
+flush privileges;
+exit
+```
+
+Tiếp theo chạy lệnh sau và nhập password(trong thư mục đã tải về) để import template:
+
+`mysql -u root -p ossecuser < src/os_dbd/mysql.schema`
+
+Thêm các dòng sau vào tệp tin cấu hình /var/ossec/etc/ossec.conf:
+
+```
+<database_output>
+	<hostname>127.0.0.1</hostname>
+	<username>ossecuser</username>
+	<password>your_password</password>
+	<database>ossec</database>
+	<type>mysql</type>
+</database_output>
+```
+
+Lưu lại file config, enable database và restart ossec:
+
+```
+/var/ossec/bin/ossec-control enable database
+/var/ossec/bin/ossec-control restart
+```
+
+8. Cài đặt OSSEC WEB UI
+
+- Yêu cầu trước khi cài đặt:
+
+Apache with PHP (>= 4.1 or >= 5.0) installed.
+
+OSSEC (version >= 0.9-3) installed.
+
+- Cài đặt apache server:
+
+`yum --enablerepo=epel,remi install httpd`
+
+Tiếp theo, bắt đầu dịch vụ httpd và cho phép nó khởi động cùng với hệ thống bằng các lệnh:
+
+```
+systemctl enable httpd.service
+systemctl start httpd.service
+```
+
+- Cài đặt epel, remi repo
+
+```
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+yum install https://rpms.remirepo.net/enterprise/remi-release-7.rpm
+```
+
+- Cài đặt php (ở đây tôi cài bản 7.3, các bạn có thể cài 1 phiên bản khác phù hợp với yêu cầu)
+
+`yum --enablerepo=epel,remi-php73 install php`
+
+Sau đó cài đặt các mô-đun PHP cần thiết. Sử dụng lệnh sau để liệt kê các mô-đun có sẵn và cài đặt nó:
+
+```
+yum --enablerepo=remi-php73 list php-*
+yum --enablerepo=remi-php73 install php-mysql php-xml php-xmlrpc php-soap php-gd
+```
+
+Sau khi cài đặt php và các mô-đun php khác khởi động lại dịch vụ Apache:
+
+`systemctl restart httpd.service`
+
+- Allow Port in Firewall:
+
+```
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --reload
+```
+
+- Cài đặt web ui ossec:
+
+Clone web ui script:
+
+`git clone https://github.com/ossec/ossec-wui.git`
+
+Di chuyển thư mục vừa clone về vào /var/www/html
+
+`mv ossec-wui /var/www/html/`
+
+Vào thư mục vừa di chuyển và chạy script (cấu hình user name, password):
+
+```
+cd /var/www/html/ossec-wui
+./setup.sh
+```
+
+Disable SE Linux (câu lệnh này chỉ tạm thời disable nó đi):
+
+`setenforce 0`
+
+- Truy cập vào giao diện web ui của ossec trên trình duyệt:
+
+`http://your_server_ip/ossec-wui/`
+
