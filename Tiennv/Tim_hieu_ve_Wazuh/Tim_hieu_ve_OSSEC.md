@@ -582,3 +582,6 @@ Disable SE Linux (câu lệnh này chỉ tạm thời disable nó đi):
 
 `http://your_server_ip/ossec-wui/`
 
+Giao diện web ui của ossec sẽ như sau
+
+<img src="img/27.png">
