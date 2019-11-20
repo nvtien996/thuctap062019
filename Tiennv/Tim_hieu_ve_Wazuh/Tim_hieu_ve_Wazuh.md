@@ -124,3 +124,95 @@ Wazuh cung cấp các khả năng sau:
 
 - Bảo mật container: Wazuh cung cấp khả năng hiển thị bảo mật vào các Docker server và container, theo dõi hành vi của chúng và phát hiện các mối đe dọa, lỗ hổng và sự bất thường. Wazuh agent có tích hợp riêng với công cụ Docker cho phép người dùng theo các images, volumes, cài đặt mạng và các container đang hoạt động. Wazuh liên tục thu thập và phân tích thông tin rumtime chi tiết. Ví dụ: cảnh báo cho các container chạy ở chế độ đặc quyền, các ứng dụng dễ bị tấn công, shell chạy trong container, thay đổi với các volumes cũng như images và các mối đe dọa có thể khác.
 
+### Kiến trúc của Wazuh
+
+Kiến trúc của Wazuh dựa trên các agent chạy trên các máy chủ được giám sát để chuyển tiếp dữ liệu nhật ký đến 1 máy chủ trung tâm. Ngoài ra các thiết bị agentless như firewall, switch, router, access point, ... cũng được hỗ trợ và có thể chủ động gửi dữ liệu nhật ký qua syslog hoặc kiểm tra định kỳ các thay đổi cấu hình của chúng để sau đó chuyển tiếp dữ liệu đến máy chủ trung tâm. Máy chủ trung tâm giải mã và phân tích thông tin đến và chuyển các kết quả tới Elaticsearch cluster để lập chỉ mục và lưu trữ. 1 Elaticsearch cluster là 1 tập hợp của 1 hoặc nhiều node (server) giao tiếp với nhau để thực hiện các hoạt động đọc và ghi trên các chỉ mục.
+
+Mô hình kiến trúc của Wazuh được chia thành 2 dạng:
+
+- Multi-node deployment
+
+- Single-node deployment
+
+#### Multi-node deployment
+
+Khi Wazuh server và Elaticsearch cluster chạy trên các host khác nhau, Filebeat được sử dụng để chuyển tiếp 1 cách an toàn các cảnh báo hoặc các archived events đến Elaticsearch server(s) sử dụng mã hóa TLS. Các cluster với nhiều node được khuyến nghị khi có 1 số lượng lớn các hệ thống cần được giám sát, khi 1 khối lượng lớn dữ liệu đang được chờ đợi hoặc khi cần tính sẵn sàng cao.
+
+Sơ đồ dưới đây minh họa cách các thành phần được phân phối khi Wazuh server và Elaticsearch cluster chyạ trên các host khác nhau. Lưu ý rằng multi-node clusters sẽ có nhiều Elastic Stack server mà Filebeat có khả năng chuyển tiếp dữ liệu:
+
+<img src="img/46.png">
+
+#### Single-node deployment
+
+Trong các tiển khai Wazuh nhỏ hơn (số lượng agent < 50), Wazuh và Elastic stack chạy với 1 single-node Elaticsearch cluster có thể được triển khai trên 1 máy chủ độc lập. Ở triển khai này, Logstash sẽ đọc các cảnh bóa, event từ Wazuh trực tiếp từ local file system và đẩy chúng tới local Elaticsearch instance
+
+<img src="img/47.png">
+
+### Giao tiếp trong Wazuh và luồng dữ liệu
+
+<img src="img/48.png">
+
+#### Agent-server communication
+
+Wazuh agent sử dụng OESSEC message protocol để gửi các event thu thập được tới Wazuh server thông qua port 1514 (UDP hoặc TCP). Wazuh server giải mã và thực hiện rule-check với các event nhận được với công cụ phân tích. Các event ứng với các rule được bổ sung dữ liệu cảnh báo như rule-id và rule-name. Các event có thể được đẩy tới 1 hoặc cả 2 file sau, dựa vào việc có được event có tương ứng với rule hay không:
+
+- File /var/ossec/logs/archives/archives.json chứa tất cả các event dù có tương ứng với rule hay không.
+
+- File /var/ossec/logs/alerts/alerts.json chỉ chứa các event tương ứng với rule đã đặt ra.
+
+OSSEC message protocol dùng 1 mã hóa 192-bit Blowfish với full 16-round implemetation hoặc mã hóa AES với 128 bit cho mỗi khối và khóa 256 bit.
+
+#### Wazuh-Elastic communication
+
+Trên mô hình triển khai diện rộng, Wazuh server sử dụng Filebeat để chuyển dữ liệu về các cảnh báo và event tới Logstash (5000/TCP) trên Elaticsearch server, sử dụng mã hóa TLS. Với kiến trúc single-host, Logstash đọc trực tiếp từ local file system mà không cần dùng Filebeat.
+
+Filebeat định dạng dữ liệu đến và có thể bổ sung thêm thông tin GeoIP trước khi gửi nó đến Elaticsearch (cổng 9200/TCP). Sau khi dữ liệu được lập chỉ mục vào Elaticsearch, Kibana (cổng 5601/TCP) được sử dụng để khai thác và trực quan hóa thông tin.
+
+Wazuh App chạy bên trong Kibana liên tục truy vấn tới RESTful API (port 55000/TCP trên Wazuh manager) để hiển thị thông tin liên quan đến cấu hình và thông tin trạng thái của server và agent, cũng như restart agent theo yêu cầu. Giao tiếp này được mã hóa với TLS và được xác thực với username và password.
+
+#### Required ports
+
+Để cài đặt Wazuh và Elastic Stack, một số cổng mạng phải có sẵn và được mở để các thành phần khác nhau có thể giao tiếp đúng giữa chúng.
+
+- Wazuh
+
+| Thành phần | Port | Giao thức | Mục đích |
+| --- | --- | --- | --- |
+| Wazuh manager | 1514 | TCP | Gửi các event thu thập được từ các agent (khi được cấu hình cho TCP) |
+| Wazuh manager | 1514 | UDP | Gửi các event thu thập được từ các agent (khi được cấu hình cho UDP) - mặc định |
+| Wazuh manager | 1515 | TCP | Agents registration service |
+| Wazuh manager | 1516 | TCP | Wazuh cluster communications |
+| Wazuh manager | 514 | TCP | Gửi các event thu thập được syslog (khi được cấu hình cho TCP) |
+| Wazuh manager | 514 | UDP | Gửi các event thu thập được syslog (khi được cấu hình cho TCP) - mặc định |
+| Wazuh API | 55000 | TCP | Incoming HTTP requests |
+
+- Elastic Stack
+
+| Thành phần | Port | Giao thức | Mục đích |
+| --- | --- | --- | --- |
+| Elasticsearch | 9200 | TCP | Elasticsearch RESTful API |
+| Elasticsearch | 9300-9400 | TCP | Elasticsearch cluster communications |
+| Kibana | 5601 | TCP | Kibana web interface |
+
+<img src="img/49.png">
+
+- Splunk
+
+| Thành phần | Port | Giao thức | Mục đích |
+| --- | --- | --- | --- |
+| Splunk | 8000 | TCP | Splunk web interface |
+| Splunk | 9997 | TCP | Cổng đầu vào (đối với Splunk Forwarder) |
+| Splunk | 8089 | TCP | Cổng quản lý (dành cho indexers) |
+| Splunk | 9887 | TCP | Splunk cluster communications |
+
+<img src="img/50.png">
+
+### Lưu trữ dữ liệu
+
+Các event về alert và non-alert được lưu trữ cùng nhau trong file trên Wazuh server ngoài việc được gửi tới Elasticsearch. Các file này được viết với dạng JSON (.json) hoặc với định dạng văn bản thuần túy (.log). Các tệp này được nén hằng ngày và được đánh dấu bằng MD5 và SHA1 checksums. Cấu trúc thư mục và tên file như sau:
+
+<img src="img/51.png">
+
+Việc Rotation và backup các file nén được khuyến khích, tùy theo khả năng lưu trữ của Wazuh Manger server. Sử dụng cron job để rà soát các file nén.
+
+Ngoài ra, bạn có thể lựa chọn việc bỏ qua việc lưu trữ các file nén, và sử dụng Elasticsearch cho các tài liệu lưu trữ, đặc biệt nếu bạn chạy Elasticsearch snapshot backup hoặc multi-node Elasticsearch cluster với shard replica cho tính sẵn sàng cao. Bạn có thể sử dụng cron job để di chuyển các index đã được snapshot tới một server lưu trữ và đánh dấu chúng với MD5 và SHA1.
