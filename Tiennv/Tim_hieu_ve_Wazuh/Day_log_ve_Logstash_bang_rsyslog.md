@@ -84,7 +84,7 @@ Như bạn có thể thấy, với mỗi tin nhắn đến, rsyslog sẽ chỉnh
 Tạo file /etc/logstash/conf.d/rsyslog.conf và thêm nội dung sau:
 
 ```
-# This input block will listen on port 10514 for logs to come in.
+# This input block will listen on port 12514 for logs to come in.
 # host should be an IP on the Logstash server.
 # codec => "json" indicates that we expect the lines we're receiving to be in JSON format
 # type => "rsyslog" is an optional identifier to help identify messaging streams in the pipeline.

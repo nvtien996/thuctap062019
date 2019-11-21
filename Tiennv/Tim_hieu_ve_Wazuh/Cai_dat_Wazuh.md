@@ -1,16 +1,16 @@
 ## Cài đặt Wazuh
 
-###. Cập nhật server và cài một số gói cần thiết:
+### Cập nhật server và cài một số gói cần thiết:
 
-`yum update -y && yum install -y wget curl`
+`yum update -y && yum install -y wget curl openssl-devel`
 
-###. Cài đặt java
+### Cài đặt java
 
 Logstash và Elasticsearch yêu cầu Java nên cần có một Java Virtual Machine để hoạt động. Vì vậy trước tiên bạn cần cài đặt Java, nếu đã cài đặt Java thì có thể bỏ qua bước này.
 
 `yum -y install java-openjdk java-1.8.0-openjdk-devel`
 
-###. Cài đặt Wazuh server
+### Cài đặt Wazuh server
 
 > Tất cả các lệnh được mô tả dưới đây cần phải được thực thi với quyền người dùng root.
 
@@ -73,7 +73,7 @@ và sau đó, cài đặt NodeJS:
 	
 	`service wazuh-api status`
 
-<img src="img/52.png">
+<img src="img/53.png">
 
 - Vô hiệu hóa Wazuh repo (tùy chọn):
 
@@ -125,7 +125,7 @@ EOF
 curl -so /etc/filebeat/filebeat.yml https://raw.githubusercontent.com/wazuh/wazuh/v3.10.2/extensions/filebeat/7.x/filebeat.yml
 chmod go+r /etc/filebeat/filebeat.yml
 ```
-- Tải xuống mẫu cảnh báo cho Elaticsearch:
+- Tải xuống mẫu cảnh báo cho Elasticsearch:
 
 ```
 curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/v3.10.2/extensions/elasticsearch/7.x/wazuh-template.json
@@ -190,7 +190,7 @@ EOF
 
 `yum install -y elasticsearch-7.4.2`
 
-- Elaticsearch sẽ chỉ nghe trên giao diện loopback (localhost) theo mặc định. Định cấu hình Elaticsearch để nghe địa chỉ khác bằng cách chỉnh sửa tệp `/etc/elasticsearch/elasticsearch.yml` và bỏ ghi chú cài đặt `network.host`. Thay đổi giá trị thành IP mà bạn muốn:
+- Elasticsearch sẽ chỉ nghe trên giao diện loopback (localhost) theo mặc định. Định cấu hình Elasticsearch để nghe địa chỉ khác bằng cách chỉnh sửa tệp `/etc/elasticsearch/elasticsearch.yml` và bỏ ghi chú cài đặt `network.host`. Thay đổi giá trị thành IP mà bạn muốn:
 
 `network.host: <elasticsearch_ip>`
 
@@ -201,7 +201,7 @@ node.name: <node_name>
 cluster.initial_master_nodes: ["<node_name>"]
 ```
 
-- Kích hoạt và bắt đầu dịch vụ Elaticsearch:
+- Kích hoạt và bắt đầu dịch vụ Elasticsearch:
 
 	- Đối với Systemd:
 	
@@ -218,9 +218,9 @@ cluster.initial_master_nodes: ["<node_name>"]
 	service elasticsearch start
 	```
 
-- Sau khi Elaticsearch hoạt động và chạy, bạn nên tải mẫu Filebeat. Chạy lệnh sau nơi Filebeat đã được cài đặt:
+- Sau khi Elasticsearch hoạt động và chạy, bạn nên tải mẫu Filebeat. Chạy lệnh sau nơi Filebeat đã được cài đặt:
 
-> Như đã đề cập, lệnh này phải được chạy trên Wazuh server.
+> Lệnh này phải được chạy trên Wazuh server.
 
 `filebeat setup --index-management -E setup.template.json.enabled=false`
 
@@ -259,16 +259,19 @@ EOF
 
 `yum install -y logstash-7.4.2`
 
-- Enable Logstash service:
+- Start và enable Logstash service:
 
 ```
 systemctl daemon-reload
 systemctl enable logstash
+systemctl start logstash
 ```
 
-- Tải xuống tệp cấu hình Wazuh cho Logstash:
+- Tải xuống tệp cấu hình Wazuh cho Logstash (nếu triển khai trên multi-node sử dụng filebeat):
 
 `curl -so /etc/logstash/conf.d/01-wazuh.conf https://raw.githubusercontent.com/wazuh/wazuh/v3.10.2/extensions/logstash/7.x/01-wazuh-remote.conf`
+
+còn nếu chạy single-node thì có thể không cần filebeat
 
 - Thêm usermode:
 
@@ -278,9 +281,9 @@ systemctl enable logstash
 
 `systemctl restart logstash`
 
-- Định cấu hình đối tượng Filebeat, thay đổi đích sự kiện từ đối tượng Elaticsearch thành đối tượng Logstash:
+- Định cấu hình đối tượng Filebeat, thay đổi đích sự kiện từ đối tượng Elasticsearch thành đối tượng Logstash:
 
-	- Vô hiệu hóa đầu ra Elaticsearch trong file `/etc/filebeat/filebeat.yml`:
+	- Vô hiệu hóa đầu ra Elasticsearch trong file `/etc/filebeat/filebeat.yml`:
 	
 	```
 	#output.elasticsearch:
@@ -289,7 +292,7 @@ systemctl enable logstash
 	
 	- Thêm đầu ra Logstash trong file `/etc/filebeat/filebeat.yml`:
 	
-	`output.logstash.hosts: ["YOUR_LOGSTASH_SERVER_IP:5044"]`
+	`output.logstash.hosts: ["YOUR_LOGSTASH_SERVER_IP:5000"]`
 
 - Khởi động lại Filebeat:
 
@@ -299,11 +302,13 @@ systemctl enable logstash
 
 `filebeat test output`
 
+<img src="img/57.png">
+
 ### Cài đặt Kibana
 
 - Cài đặt gói Kibana:
 
-`yum install kibana-7.4.2`
+`yum install -y kibana-7.4.2`
 
 - Cài đặt plugin ứng dụng Wazuh cho Kibana:
 
@@ -321,3 +326,153 @@ systemctl enable logstash
 
 `server.host: "<kibana_ip>"`
 
+- Định cấu hình URL của các phiên bản Elasticsearch để sử dụng cho tất cả các truy vấn của bạn bằng cách chỉnh sửa tập tin `/etc/kibana/kibana.yml`:
+
+`elasticsearch.hosts: ["http://<elasticsearch_ip>:9200"]`
+
+- Kích hoạt và bắt đầu dịch vụ Kibana:
+
+	- Đối với Systemd:
+	
+	```
+	systemctl daemon-reload
+	systemctl enable kibana.service
+	systemctl start kibana.service
+	```
+	
+	- Đối với SysV Init:
+	
+	```
+	chkconfig --add kibana
+	service kibana start
+	```
+
+- Vô hiệu hóa Elasticsearch repo (tùy chọn):
+
+`sed -i "s/^enabled=1/enabled=0/" /etc/yum.repos.d/elastic.repo`
+
+- Add port firewall:
+
+```
+firewall-cmd --add-port=5601/tcp --permanent
+firewall-cmd --reload
+```
+
+- Disable SE Linux:
+
+Kiểm tra trạng thái SE Linux:
+
+`sestatus`
+
+Nếu SE Linux đang enable thì tắt như sau:
+
+`sed -i 's/^SELINUX=.*/\SELINUX=disabled/' /etc/selinux/config`
+
+Sau đó reboot server.
+
+### Kết nối Wazuh App với API
+
+Chúng ta sẽ register Wazuh API (đã được install trên Wazuh server) tới Wazuh App trên Kibana :
+
+- Kích hoạt tùy chọn HTTPS:
+
+Để bật HTTPS, bạn có thể tự tạo chứng chỉ của riêng mình hoặc tự động tạo chứng chỉ bằng cách sử dụng tập lệnh:
+
+`/var/ossec/api/scripts/configure_api.sh`
+
+- Trên Wazuh server chạy các lệnh sau với quyền root để set thông tin bảo mật cho Wazuh API:
+
+```
+cd /var/ossec/api/configuration/auth
+node htpasswd -Bc -C 10 user yourUserName
+```
+
+- Sau đó, bạn sẽ cần phải khởi động lại `wazuh-api` và `wazuh-manager` để các thay đổi có hiệu lực:
+
+```
+systemctl restart wazuh-api
+systemctl restart wazuh-manager
+```
+
+- Mở Web browser và tới Elastic Stack server IP trên port 5601. Tới Wazuh App
+
+<img src="img/55.png">
+
+- Tại phần Wazuh API configuration điền các thông tin đã đăng ký vào:
+
+<img src="img/56.png">
+
+Nếu bạn sử dụng Wazuh Documentation cho Nginx, URL phải là https://localhost
+
+### Cài đặt Wazuh agent
+
+> Wazuh agent sẽ được cài đặt trên những host cần giám sát.
+
+- Thêm Wazuh repository:
+
+```
+rpm --import http://packages.wazuh.com/key/GPG-KEY-WAZUH
+cat > /etc/yum.repos.d/wazuh.repo <<\EOF
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh repository
+baseurl=https://packages.wazuh.com/3.x/yum/
+protect=1
+EOF
+```
+
+- Cài đặt Wazuh agent với câu lệnh:
+
+`yum install -y wazuh-agent`
+
+hoặc truy cập địa chỉ Elastic Stack server IP trên port 5601, tới Wazuh APP, chọn mục Agent, tại đây chọn `Add new agent`
+
+<img src="img/58.png">
+
+tại đây, chọn hđh và điền ip Wazuh server vào và chạy câu lệnh bên dưới với quyền root trên host cân giám sát.
+
+<img src="img/59.png">
+
+- Register cho các Agent:
+
+	- Trên server:
+	
+		- Chạy câu lệnh:
+		
+		`/var/ossec/bin/manage_agents`
+		
+		<img src="img/60.png">
+		
+		- Chọn `a` để thêm 1 agent. Điền tên và ip cho agent
+		
+		- Sau đó chọn `e` để tạo 1 pre-shared key để liên lạc giữa server và agent.
+		
+		<img src="img/61.png">
+	
+	- Trên agent:
+	
+		- Chạy câu lệnh:
+		
+		`/var/ossec/bin/manage_agents`
+		
+		<img src="img/61.png">
+		
+		- Chọn `i` để import key đã tạo từ phía server.
+		
+		- Chỉnh sửa ip của server trong file `/var/ossec/etc/ossec.conf`, thay `MANAGE_IP` bằng ip của server:
+		
+		```
+		<client>
+			<server-ip>MANAGE_IP</server-ip>
+		</client>
+		```
+
+> Chú ý : Register đè một agent
+VD : Một agent tên là Server với IP 10.0.0.10 đã được install và có ID là 005. Giả sử agent được reinstall, chúng ta cần phải reinstall agent mới và kết nối lại với Manager. Sử dụng câu lệnh sau trên Manager :
+`/var/ossec/bin/manage_agents -n Agent_name -a 10.10.10.10 -F 0`
+
+- Truy cập vào Wazuh APP trên kibana để kiểm tra agent vừa thêm vào:
+
+<img src="img/62.png">
