@@ -61,7 +61,9 @@ filebeat.config.modules:
   path: ${path.config}/modules.d/*.yml
   
   reload.enabled: true
+```
 
+```
 setup.template.settings:
   index.number_of_shards: 1
 ```

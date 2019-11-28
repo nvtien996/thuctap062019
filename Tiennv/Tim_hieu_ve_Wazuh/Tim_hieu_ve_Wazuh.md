@@ -138,7 +138,7 @@ Mô hình kiến trúc của Wazuh được chia thành 2 dạng:
 
 Khi Wazuh server và Elaticsearch cluster chạy trên các host khác nhau, Filebeat được sử dụng để chuyển tiếp 1 cách an toàn các cảnh báo hoặc các archived events đến Elaticsearch server(s) sử dụng mã hóa TLS. Các cluster với nhiều node được khuyến nghị khi có 1 số lượng lớn các hệ thống cần được giám sát, khi 1 khối lượng lớn dữ liệu đang được chờ đợi hoặc khi cần tính sẵn sàng cao.
 
-Sơ đồ dưới đây minh họa cách các thành phần được phân phối khi Wazuh server và Elaticsearch cluster chyạ trên các host khác nhau. Lưu ý rằng multi-node clusters sẽ có nhiều Elastic Stack server mà Filebeat có khả năng chuyển tiếp dữ liệu:
+Sơ đồ dưới đây minh họa cách các thành phần được phân phối khi Wazuh server và Elaticsearch cluster chạy trên các host khác nhau. Lưu ý rằng multi-node clusters sẽ có nhiều Elastic Stack server mà Filebeat có khả năng chuyển tiếp dữ liệu:
 
 <img src="img/46.png">
 

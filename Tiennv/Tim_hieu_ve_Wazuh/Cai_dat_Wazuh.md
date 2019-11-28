@@ -435,6 +435,10 @@ tại đây, chọn hđh và điền ip Wazuh server vào và chạy câu lệnh
 
 <img src="img/59.png">
 
+- Start wazuh-agent:
+
+`systemctl start wazuh-agent`
+
 - Register cho các Agent:
 
 	- Trên server:

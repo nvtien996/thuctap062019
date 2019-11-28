@@ -82,6 +82,16 @@ Output là bước cuối cùng trong chuỗi các bước xử lý của Logsta
 
 Để biết thêm thông tin về các output sẵn có, xem thêm tại [đây](https://www.elastic.co/guide/en/logstash/current/output-plugins.html)
 
+### Codecs
+
+Codec về cơ bản là các bộ lọc luông có thể hoạt động nhừ 1 phần cuat input hoặc output. Codec cho phép bạn dễ dàng tách việc vận chuyển các tin nhắn cảu bạn khỏi quá trình tuần tự hóa. Codec phổ biến bao gồm json, msgpack và plain (văn bản)
+
+- json: mã hóa và giải mã dữ liệu theo định dạng json
+
+- multiline: hợp nhất các sự kiện văn bản nhiều dòng như java exception và stacktrace message vào 1 sự kiện
+
+Xem thêm các codec được hỗ trợ tại [đây](https://www.elastic.co/guide/en/logstash/current/codec-plugins.html)
+
 ### Cấu trúc thư mục của Logstash
 
 | Loại | Miêu tả | Đường dẫn folder | Thông số |
