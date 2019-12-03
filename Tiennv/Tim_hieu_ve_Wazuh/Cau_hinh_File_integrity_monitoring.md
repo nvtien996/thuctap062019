@@ -70,7 +70,17 @@ Giám sát who-data được cấu hình với tùy chọn `whodata`. Tùy chọ
 </syscheck>
 ```
 
-5. Cấu hình để bỏ qua các tập tin
+5. Cấu hình để báo cáo các thay đổi
+
+Sử dụng tùy chọn `report_changes`, chúng ta có thể thấy những gì cụ thể đã thay đổi trong tệp văn bản. Hãy cẩn thận về những thư mục bạn thiết lập `report_changes`, vì để thực hiện việc này, Wazuh sao chép mọi tệp bạn muốn theo dõi vào một vị trí riêng tư.
+
+```
+<syscheck>
+  <directories check_all="yes" realtime="yes" report_changes="yes">/test</directories>
+</syscheck>
+```
+
+6. Cấu hình để bỏ qua các tập tin
 
 Các tệp và thư mục có thể được bỏ qua bằng cách sử dụng tùy chọn ignore (hoặc registry_ignore cho các mục Windows registry). Để tránh các kết quả báo động giả, `syscheck` có thể được cấu hình để bỏ qua các tệp nhất định không cần phải theo dõi.
 
@@ -82,7 +92,7 @@ Các tệp và thư mục có thể được bỏ qua bằng cách sử dụng t
 </syscheck>
 ```
 
-6. Bỏ qua các tập tin thông qua các quy tắc
+7. Bỏ qua các tập tin thông qua các quy tắc
 
 Cũng có thể bỏ qua các tệp bằng cách sử dụng các quy tắc, như trong ví dụ này:
 
@@ -94,7 +104,7 @@ Cũng có thể bỏ qua các tệp bằng cách sử dụng các quy tắc, nh�
 </rule>
 ```
 
-7. Thay đổi mức độ nghiêm trọng
+8. Thay đổi mức độ nghiêm trọng
 
 Với quy tắc tùy chỉnh, mức độ cảnh báo `syscheck` có thể được thay đổi khi phát hiện thay đổi đối với một tệp hoặc mẫu tệp cụ thể.
 
