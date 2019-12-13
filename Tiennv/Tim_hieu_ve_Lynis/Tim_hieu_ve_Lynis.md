@@ -300,9 +300,9 @@ Lynis hỗ trợ một định dạng báo cáo, có thể được sử dụng 
 
 Nội dung của tập tin báo cáo:
 
-- Nhận xét = #<remark>
-- Mục = [<section name>]
-- Tùy chọn/giá trị = <option name>=<option value>
+- Nhận xét = `#<remark>`
+- Mục = `[<section name>]`
+- Tùy chọn/giá trị = `<option name>=<option value>`
 
 Khi một tùy chọn có thể có nhiều giá trị (ví dụ như các gói đã cài đặt), dấu ngoặc `[]` sẽ được thêm vào. Ví dụ: installed_package[]=Package-1.0.0
 
