@@ -191,7 +191,7 @@ sed -i 's/#listen_addr = "192.168.0.1"/listen_addr = "0.0.0.0"/g' /etc/libvirt/l
 
 - Tiếp tục thực hiện lệnh sau:
 
-`sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/g' /etc/sysconfig/libvirt`
+`sed -i 's/#LIBVIRTD_ARGS="--listen"/LIBVIRTD_ARGS="--listen"/g' /etc/sysconfig/libvirtd`
 
 - Sau đó tiến hành restart lại libvirtd:
 
@@ -263,6 +263,6 @@ Chuyển sang tab `Snapshot`, đặt tên cho snapshot rồi bấm `Create Snaps
 
 <img src="img/36.png">
 
-Delete máy ảo, chọn tab `Destroy`, tick vào ô `Delete HDD image` rôi chọn `Xóa`
+Delete máy ảo, chọn tab `Destroy`, tick vào ô `Delete HDD image` rồi chọn `Xóa`
 
 <img src="img/37.png">

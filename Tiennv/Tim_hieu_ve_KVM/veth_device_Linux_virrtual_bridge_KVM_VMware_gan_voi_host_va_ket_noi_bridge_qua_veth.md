@@ -94,11 +94,11 @@ Theo ví dụ của tôi, tôi sẽ đính kèm máy chủ bằng cách sử d�
 
 <img src="img/78.png">
 
-Bây giờ, chúng tôi gán một địa chỉ IP cho giao diện vmh2:
+Bây giờ, chúng tôi gán một địa chỉ IP cho giao diện vmh2 - vốn không lệ thuộc bởi bất kỳ bridge nào:
 
 <img src="img/79.png">
 
-Sau đó tôi kích hoạt vmh1 và vmh2. Tiếp theo, tôi cần một tuyến đường trên máy chủ đến bridge (và khách tại các cổng của nó) qua vmh2 (!!):
+Sau đó tôi kích hoạt vmh1 và vmh2. Tiếp theo, tôi cần định tuyến trên máy host đến bridge (và các máy khách tại các cổng của nó) thông qua vmh2:
 
 <img src="img/80.png">
 
@@ -114,3 +114,74 @@ Và trong tất cả tôi thích tình huống này hơn nhiều so với việc
 
 Bây giờ, tôi cố gắng tạo một liên kết giữa 2 Linux bridge. Vì việc Linux bridge cascading bị cấm, thật thú vị khi tìm hiểu xem ít nhất có cho phép liên kết các bridge hay không. Tôi sử dụng một cặp veth bổ sung cho mục đích này:
 
+<img src="img/82.png">
+
+Lưu ý rằng giao thức STP được kích hoạt trên cả 2 bridge! (Nếu bạn thấy điều gì đó khác biệt, bạn có thể kích hoạt STP theo cách thủ công thông qua các tùy chọn của lệnh brctl).
+
+Bây giờ, hãy kiểm tra xem chúng ta có thể giao tiếp từ "kali3" tại "virbr6" qua cặp veth và "virbr4" với máy host không?
+
+<img src="img/83.png">
+
+và
+
+<img src="img/84.png">
+
+Vâng, rõ ràng là chúng ta có thể - và cả máy host có thể giao tiếp được với máy ảo "kali3".
+
+<img src="img/85.png">
+
+và tất nhiên trên cả máy ảo "kali2":
+
+<img src="img/03.gif">
+
+Đây chỉ là một ví dụ khác về cách chúng ta có thể sử dụng cặp veth. Chúng ta có thể liên kết các Linux bridge với nhau - và tất cả máy khách ở cả 2 bridge đều có thể liên lạc với nhau và với máy host.
+
+### Kết nối virtual VMware bridge với Linux bridge thông qua cặp veth
+
+Thử nghiệm cuối cùng cảu tôi liên quan đến VMware WS bridge. Ta có thể sử dụng VMware Network Editor để xác định 1 "VMware Host Only Network" thông thường. Tuy nhiên, khi ta sử dụng chế độ bridge cho 1 mạng như vậy thì VMware sẽ tự động gán địa chỉ. Không có cách nào để tránh điều này, tôi cần phải xóa địa chỉ này theo cách thủ công sau đó
+
+Vì vây, hãy thử 1 cáh tiếp cận khác
+
+Đầu tiên, tôi tạo 1 cặp veth - và sau đó là bridge
+
+<img src="img/86.png">
+
+>Lưu ý: nếu lệnh `brctl link` không chạy thì có thể thử `brctl addif`
+
+Để tạo VMware bridge cần thiết cho vmw2, tôi sử dụng VMware Virtual Network Editor:
+
+<img src="img/04.gif">
+
+Lưu ý rằng bằng cách tạo 1 bridge cụ thể đến một trong các thiết bị veth, tôi đã tránh được việc gán địa chỉ IP tự động cho thiết bị Ethernet thường được tạo bởi VMware cùng với host only bridge. Do đó, tôi tránh mọi xung đột với việc gán địa chỉ đã được thực hiện cho "vmh2" (xem bên trên).
+
+Trong máy khách VMware (hệ thống Win), tôi định cấu hình thiết bị mạng - ví dụ: với địa chỉ 192.168.50.21 - và sau đó:
+
+<img src="img/05.gif">
+
+Tuyệt vời! Hơn cả những gì mà tôi mong đợi! Tất nhiên các KVM guest khác của tôi và máy host cũng có thể gửi các gói đến máy khách VMware.
+
+### Tóm lược
+
+Cặp veth dễ dàng để tạo và sử dụng. Chúng là những công cụ lý tưởng để kết nối máy host và các Linux bridge hoặc VMware bridge khác với 1 Linux bridge theo cách được xác định rõ.
+
+### Một nhận xét về DHCP
+
+Việc gán địa chỉ hợp lý và được xác định chính xác cho các bridge và hoặc các giao diện ảo có thể trở thành vấn đề với VMware cũng như với KVM / virt-manager hoặc virsh. Đặc biệt, khi bạn muốn tránh việc gán địa chỉ cho các bridge. Thông thường, khi bạn xác định mạng ảo trong môi trường ảo hóa của mình, 1 bridge được tạo cùng với giao diện Ethernet đính kèm cho máy host - thứ mà bạn có thể không thực sự cần. Ngoài ra, nếu bạn bật chức năng DHCP cho bridge / mạng, thì chính bridge này (hoặc thiết bị có liên quan) chắc chắn sẽ (!) tự động nhận địa chỉ như 192.168.50.1. Hơn nữa các tuyến máy chủ liên quan được tự động thiết lập. Điều này có thể dẫn đến xung đột với những gì bạn thực sự muốn đạt được.
+
+Do đó: Nếu bạn muốn làm việc với DHCP, tôi khuyên bạn nên làm điều này với dịch vụ DHCP trung tâm trên máy chủ Linux và không sử dụng các dịch vụ DHCP của các môi trường ảo hóa khác nhau. Nếu bạn muốn tránh việc gán địa chỉ IP cho các bridge, bạn có thể cần phải làm việc với các DHCP pool và group. Điều này nằm ngoài phạm vi của bài viết này - mặc dù bản thân nó rất thú vị. Tất nhiên, 1 giải pháp thay thế sẽ là thiết lập toàn bộ mạng ảo với sự trợ giúp của tập lệnh, có thể (với một công việc cấu hình nhỏ) được bao gồm như 1 unit bên trong systemd.
+
+### Cấu hình veth liên tục
+
+Ở đây tôi có một chút vấn đề với Opensuse 13.2 / Leap 42.1! Lý do là systemd trong Leap và OS 13.2 là phiên bản 210 và chưa có dịch vụ "systemd-networkd.service" - thứ cần thiết để hỗ trợ việc tạo ra các thiết bị ảo như "veth" trong quá trình khởi động hệ thống. Theo hiểu biết của tôi, cả dịch vụ "wicked" được sử dụng bởi Opensuse cũng như các tệp "ifcfg -..." đều không cho phép định nghĩa các cặp veth. Tuy nhiên, việc tạo các bridge và gán địa chỉ cho các thiết bị ethernet hiện tại được hỗ trợ.
+
+Tất nhiên, bạn có thể viết một tập lệnh tạo và cấu hình tất cả các cặp veth cần thiết của bạn. Tập lệnh này có thể được tích hợp trong quá trình khởi động dưới dạng dịch vụ systemd để được khởi động trước "wicked.service". Ngoài ra, bạn có thể định cấu hình các thiết bị Ethernet hiện có sau đó với các tệp "ifcfg -..." -. Các tệp như vậy cũng có thể được sử dụng để đảm bảo thiết lập tự động các Linux bridge và sự lệ thuộc của chúng đối với các thiết bị Ethernet được xác định.
+
+Một tùy chọn khác là - nếu bạn dám chấp nhận một số rủi ro - tìm nạp phiên bản 224 của systemd từ kho lưu trữ Tumbleweed của Opensuse. Sau đó, bạn có thể tạo 1 thư mục "/etc/systemd/network" và định cấu hình việc tạo các cặp veth thông qua các tệp ".... netdev" tương ứng trong thư mục. Ví dụ:
+
+<img src="img/87.png">
+
+Tôi đã thử và nó hoạt động. Tuy nhiên, phiên bản systemd 224 gặp rắc rối với việc sắp xếp lại khởi động apparmor của Leap. Tôi chưa xem xét chi tiết này.
+
+Tuy nhiên, hãy vui vẻ với các thiết bị veth trong mạng ảo của bạn!
+
+> Tham khảo: https://linux-blog.anracom.com/2016/02/02/fun-with-veth-devices-linux-virtual-bridges-kvm-vmware-attach-the-host-and-connect-bridges-via-veth/
