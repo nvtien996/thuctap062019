@@ -72,7 +72,7 @@ Thẻ là 1 thành phần không thể thiéu trong file xml là domain. Nó có
 
 `name`: tên máy ảo, bao gồm cá ký tự số và chữ cái, đay là tên duy nhất cho các vm, không được trùng nhau
 
-`uuid`: mã nhạn danh quốc tế duy nhất cho các máy ảo, theo format RFC 4122. Nếu thhiếu trường này khi được khởi tạo, nó sẽ tự động được generate
+`uuid`: mã nhận danh quốc tế duy nhất cho các máy ảo, theo format RFC 4122. Nếu thiếu trường này khi được khởi tạo, nó sẽ tự động được generate
 
 `title`: tiêu đề của máy ảo
 

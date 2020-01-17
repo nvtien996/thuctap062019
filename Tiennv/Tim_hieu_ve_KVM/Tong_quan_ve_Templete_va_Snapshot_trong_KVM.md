@@ -1,4 +1,4 @@
-## Tổng quan về Templete và Snapshot trong KVM
+## Tổng quan về Template và Snapshot trong KVM
 
 ### 1. Template
 
@@ -38,6 +38,40 @@
 
 ### 3. Tạo và quản lý template
 
-- Hai khái niệm mà người dùng cần phân biệt đó là `clone` và `template`. Nếu `clone` đơn thuần chỉ là một bản sao của máy ảo thì `template` được coi là master copy của VM, nó có thể được dùng để tạo ra rất nhiều `clone` khác nữa.
+- Hai khái niệm mà người dùng cần phân biệt đó là `clone` và `template`. Nếu `clone` đơn thuần chỉ là một bản sao của máy ảo thì `template` được coi là master copy của VM, nó có thể được dùng để tạo ra rất nhiều `clone` khác nữa. Template là bản sao chính của máy ảo thường bao gồm HĐH khách, bộ ứng dụng và cấu hình VM cụ thể. Các template được sử dụng khi cần triển khai nhiều máy ảo và đảm bảo rằng chúng phù hợp và được chuẩn hóa.
 
 - Có hai phương thức để triển khai máy ảo từ `template` đó là `Thin` và `Clone`
+
+	- Thin: Máy ảo được tạo ra theo phương thức này sẽ sử dụng template như một base image, lúc này nó sẽ được chuyển sang trạng thái read only. Cùng với đó, sẽ có một ổ mới hỗ trợ "copy on write" được thêm vào để lưu dữ liệu mới. Phương thức này tốn ít dung lượng hơn tuy nhiên các VM được ra sẽ phụ thuộc vào base image, chúng sẽ không chạy được nếu không có base image.
+	
+	- Clone: Máy ảo được tạo ra là một bản sao hoàn chỉnh và hoàn toàn không phụ thuộc vào template cũng như máy ảo ban đầu. Tuy nhiên, nó sẽ chiếm dung lượng trên ổ đĩa giống như máy ảo ban đầu.
+
+- Template thực chất là máy ảo được chuyển đổi sang. Quá trình này gồm 3 bước:
+
+	- Bước 1: Cài đặt máy ảo với các phần mềm cần thiết để biến nó thành template.
+	
+	- Bước 2: Loại bỏ những cài đặt như password SSH, địa chỉ MAC,... để đảm bảo rằng nó sẽ không được áp dụng vào các máy ảo được tạo ra từ template này.
+	
+	- Bước 3: Đánh dấu máy ảo là template bằng việc đổi tên.
+
+### 4. Các bước cụ thể tạo template với máy ảo CentOS 7
+
+- Cài đặt Cen 7 trên KVM, triển khai những dịch vụ cần thiết
+
+- Shutdown máy ảo với câu lệnh `virsh shutdown VMname`
+
+- Sử dụng công cụ `virt-sysprep` để "niêm phong" máy ảo:
+
+    - Cần cài đặt gói `libguestfs-tools-c` để có thể sử dụng được công cụ này. Nó được sử dụng để loại bỏ những thông tin cụ thể của hệ thống đồng thời niêm phong và biến máy ảo trở thành template.
+
+    - Ở đây ta có thể sử dụng 2 tùy chọn để dùng `virt-sysprep` đó là `-a` và `-d`. Tuỳ chọn `-d` được sử dụng với tên hoặc UUID của máy ảo, tuỳ chọn `-a` được sử dụng với đường dẫn tới ổ đĩa máy ảo.
+
+- Bây giờ ta có thể đánh dấu máy ảo trở thành template. Người dùng cũng có thể backp file XML và tiến hành "undefine" máy ảo trong libvirt.
+
+- Sử dụng `virt-manager` để thay đổi tên máy ảo, đối với việc backup file XML, sử dụng câu lệnh: `virsh dumpxml Template_VMname > /root/Template_VMname.xml`
+
+- Để undefine máy ảo, sử dụng câu lệnh `virsh undefine VMname`
+
+
+
+
