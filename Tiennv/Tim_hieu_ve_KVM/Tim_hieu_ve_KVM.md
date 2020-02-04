@@ -179,7 +179,7 @@ Các tính năng chính:
 
 	- Các VM trong KVM mặc định được lưu trong thư mục `/var/lib/libvirt/imagaes/`
 	
-	- Thông tin cấu hình máy ảo nằm trong thư mục `/etc/libvirt/qemu/` dưới dạng các file xml. Có thể chỉnh sửa trực tiếp các file này hoặc dùng lệnh `virt edit <tên_máy_ảo>`
+	- Thông tin cấu hình máy ảo nằm trong thư mục `/etc/libvirt/qemu/` dưới dạng các file xml. Có thể chỉnh sửa trực tiếp các file này hoặc dùng lệnh `virsh edit <tên_máy_ảo>`
 	
 	- Các file log của KVM nằm trong thư mục `/var/log/libvirt/`
 	
