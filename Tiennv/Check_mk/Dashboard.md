@@ -177,8 +177,8 @@ Tùy thuộc vào nguồn dữ liệu đã chọn, các cột khác nhau có s�
 
 Kiểm tra thông tin *Show information of a single host* xác định rằng chế độ xem mới mô tả một host cụ thể. Do đó, bạn đã tạo cơ sở cho chế độ xem không phải global mà chỉ hiển thị qua liên kết:
 
-	- Đối với host view với nút ngữ cảnh (có thể ẩn phía sau ![](https://checkmk.com/bilder/context_button_dots.png)
+	+ Đối với host view với nút ngữ cảnh (có thể ẩn phía sau ![](https://checkmk.com/bilder/context_button_dots.png)
 
-	- Là một liên kết trong một cột (ví dụ: nhấp vào tên máy chủ trong dạng view)
+	+ Là một liên kết trong một cột (ví dụ: nhấp vào tên máy chủ trong dạng view)
 
-Có hai khả năng cho loại ngữ cảnh Services: Nếu bạn chỉ chọn *Show information of a single service*, bạn có thể tạo chế độ xem hiển thị tất cả các services có cùng tên trên các host khác nhau. Nếu đó phải là một service cụ thể cho một host, thì hãy chọn {{Show information of a single host}}.
+Có 2 khả năng cho loại ngữ cảnh Services: Nếu bạn chỉ chọn *Show information of a single service*, bạn có thể tạo chế độ xem hiển thị tất cả các services có cùng tên trên các host khác nhau. Nếu đó phải là một service cụ thể cho một host, thì hãy chọn {{Show information of a single host}}.

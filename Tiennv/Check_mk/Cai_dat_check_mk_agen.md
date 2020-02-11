@@ -22,7 +22,7 @@ tùy theo client sử dụng hđh nào mà tải xuống gói tin tương ứng.
 
 ```
 cd /tmp
-wget http://192.168.20.81/wjbu/check_mk/agents/check-mk-agent-1.6.0p8-1.noarch.rpm
+wget http://ip_check_mk/wjbu/check_mk/agents/check-mk-agent-1.6.0p8-1.noarch.rpm
 ```
 
 nếu chưa có `wget`, hãy cài nó
@@ -123,7 +123,7 @@ Sau đó lưu lại để hoàn thành thêm host mới :
 
 ```
 cd /tmp
-wget http://192.168.20.81/wjbu/check_mk/agents/check-mk-agent_1.6.0p8-1_all.deb
+wget http://ip_check_mk/wjbu/check_mk/agents/check-mk-agent_1.6.0p8-1_all.deb
 ```
 
 - Cài đặt agent bằng lệnh sau:
