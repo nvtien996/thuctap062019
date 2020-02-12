@@ -105,3 +105,115 @@ Bước 3: Active những thay đổi:
 <img src="img/67.png">
 
 <img src="img/68.png">
+
+- Gửi mail cảnh báo cho host:
+
+Bước 1: Thêm Rule gửi email cho Host
+
+truy cập `WATO - CONFIGURATION` -> `Notifications` -> `New Rule`
+
+<img src="img/69.png">
+
+Bước 2: Điền thông tin cho rule
+
+Trong ví dụ này, tôi sẽ thêm **Rule** với **Description là** `Send mail for host when status change` (tùy chọn) và **Group** nhận bản tin cảnh báo là `group1` cho host `cent7`, các tùy chọn như sau:
+
+<img src="img/70.png">
+
+Bước 3: Lưu lại các thay đổi:
+
+<img src="img/71.png">
+
+<img src="img/72.png">
+
+Bước 4: Chỉnh thời gian lặp lại thông báo nếu sự cố chưa được khắc phục:
+
+Tại tab `WIEWS`, chọn `Hosts` -> `All Hosts` và bấm vào biểu tượng 3 que bên cạnh tên host, chọn `Parameters for this host`:
+
+<img src="img/73.png">
+
+Kéo xuống bên dưới, tìm đến rule `Periodic notifications during host problems`:
+
+<img src="img/74.png">
+
+thêm 1 rule mới cho host:
+
+<img src="img/75.png">
+
+Điền thời gian gửi lại thông báo (Đơn vị: Phút; Mặc định: 120 phút), chọn host muốn áp dụng Rule (Nếu không xác định host cụ thể, mặc định Check_mk sẽ áp dụng cho tất cả các host) và save lại.
+
+<img src="img/76.png">
+
+Lưu lại các thay đổi:
+
+<img src="img/77.png">
+
+<img src="img/78.png">
+
+- Gửi cảnh báo cho Service:
+
+Bước 1: Thêm Rule gửi email cho Service:
+
+tại tab `WATO - CONFIGURATION` chọn `Notifications` -> `New Rule`
+
+<img src="img/79.png">
+
+Bước 2: Điền thông tin cho rule:
+
+thêm **Rule** với **Description** là `Send mail for services when status change` (tùy chọn) và **User** nhận cảnh báo là `user1`, để gửi cảnh báo cho service `SSH` và save lại
+
+<img src="img/80.png">
+
+Bước 3: Lưu lại các thay đổi
+
+<img src="img/81.png">
+
+<img src="img/82.png">
+
+- Cấu hình cảnh báo leo thang:
+
+Bước 1: Tạo các group nhận cảnh báo:
+
+tại tab `WATO - CONFIGURATION`, chọn `Contact Groups` -> `New contact group`, tạo 1 group mới tên là `group2`:
+
+<img src="img/83.png">
+
+Bước 2: Add user vào group vừa tạo
+
+tại tab `WATO - CONFIGURATION`, chọn `Users` -> `New user`, tạo 1 user mới là `user2` và thêm vào group mới tạo:
+
+<img src="img/84.png">
+
+Bước 3: Tạo rule nhận email cho các group
+
+Tìm đến tab `WATO - CONFIGURATION`, chọn `Notifications` -> `New Rule`:
+
+<img src="img/85.png">
+
+Điền thông tin cho rule thứ nhất ở mức cảnh báo level 1:
+
+<img src="img/86.png">
+
+Tạo tiếp rule cho mức cảnh báo level 2:
+
+<img src="img/87.png">
+
+Bước 4: Lưu lại các thay đổi:
+
+<img src="img/88.png">
+
+<img src="img/89.png">
+
+- Cảnh báo âm thanh:
+
+Tính năng này sẽ phát âm thanh trên Web UI mỗi khi host/service thay đổi trạng thái. Chúng ta cấu hình nó như sau:
+
+Vào `WATO - CONFIGURATION`, chọn `Global Settings` -> `User Interface` và bật tính năng `Enable sounds in views` chuyển từ `OFF` thành `ON` như hình:
+
+<img src="img/90.png">
+
+Lưu lại các thay đổi:
+
+<img src="img/91.png">
+
+<img src="img/92.png">
