@@ -54,7 +54,56 @@ Trong vai trò *User*, quyền này theo mặc định bị vô hiệu hóa. Ng�
 
 ### Cấu hình BI
 
-Đầu tiên ở giao diện `WATO - CONFIGURATION` chọn `Business Intelligence`
+- Đầu tiên ở giao diện `WATO - CONFIGURATION` chọn `Business Intelligence`
 
 <img src="img/243.png">
 
+- Bạn sẽ nhìn thấy các BI Pack được cấu hình ở đây, mặc định sẽ có sẵn một Pack. Giờ chúng ta sẽ thử tạo một cái mới, chọn `New BI Pack`:
+
+<img src="img/247.png">
+
+- Điền các thông tin cần thiết rồi bấm `Create` để tạo
+
+<img src="img/248.png">
+
+- Ta sẽ không Activate Change bây giờ, tiếp tục tạo các rule trong BI pack này:
+
+<img src="img/249.png">
+
+<img src="img/250.png">
+
+<img src="img/251.png">
+
+- Tiếp tục tạo thêm rule
+
+<img src="img/252.png">
+
+<img src="img/253.png">
+
+- Tạo 1 rule kết nối 2 rule vừa xong
+
+<img src="img/254.png">
+
+<img src="img/255.png">
+
+- Tiếp theo ta định nghĩa một Aggregation
+
+<img src="img/256.png">
+
+<img src="img/257.png">
+
+ở mục `Rule to call` thị chọn `Rule_03` vừa tạo để kết nối 2 `Rule_01` và `Rule_02`
+
+<img src="img/258.png">
+
+- Activate chaange những thay đổi
+
+<img src="img/259.png">
+
+<img src="img/260.png">
+
+- Vào `VIEWS` -> `Business Intelligence` -> `All Aggregations` để kiểm tra kết quả
+
+<img src="img/261.png">
+
+<img src="img/262.png">
