@@ -159,8 +159,100 @@ Các tùy chọn có các ý nghĩa sau:
 
 Lưu ý: Trong mỗi dòng logfile, bạn có thể sử dụng `regex` và `iregex` nhiều nhất một lần.
 
+- Tệp lưu trạng thái
+
+Để chỉ gửi tin nhắn mới, `mk_logwatch` ghi nhớ số byte offset của mỗi logfile đã thấy cho đến nay. Nó giữ thông tin đó trong tệp `/var/lib/check_mk/logwatch.state`. Nếu một logfile được quét lần đầu tiên, tất cả các thông báo hiện có được coi là lịch sử và bị bỏ qua - bất kể mẫu nào.
+
 ### Logwatch trên Windows
 
 `check_mk_agent.exe` cho Windows tự động giám sát Windows Eventlog. Output của nó hoàn toàn tương thích với phần mở rộng logwatch cho Linux / UNIX. Sự khác biệt chính là Windows đã phân loại các thông báo của nó bằng `Warning` hoặc `Error`. Hơn nữa, agent tự động theo dõi tất cả các bản ghi sự kiện hiện có mà nó tìm thấy, do đó bạn không cần cấu hình nào trên host target. Tuy nhiên - có thể phân loại lại các tin nhắn ở mức cao hơn hoặc thấp hơn thông qua biến cấu hình `logwatch_patterns`. Các tin nhắn được phân loại là thông tin của Windows không thể được phân loại lại do chúng không được gửi bởi agent.
 
 Windows agent hiện cũng hỗ trợ giám sát các tệp văn bản tùy chỉnh, giống như linux / unix agent.
+
+### Logwatch web page
+
+Bất cứ khi nào logwatch phát hiện có log messages mới được thêm vào, nó sẽ lưu chúng trên máy chủ Nagios trong một thư mục mặc định là `/opt/omd/sites/tên_site/var/check_mk/logwatch`. Mỗi host khác nhau sẽ có 1 thư mục con và mỗi thông điệp của logfile được lưu trong 1 tệp
+
+Dịch vụ Nagios phản ánh logfile đang ở trạng thái warning hoặc critical, nếu tệp đó tồn tại và chứa ít nhất một cảnh báo hoặc thông báo warning hoặc critical message.
+
+Tập tin `logwatch.py` trong thư mục `/opt/omd/versions/x.x.x/lib/python/cmk/gui/` sẽ điều khiển các hành động trên Web UI, cho phép bạn duyệt nhanh các thông báo trong file đó và sẽ thừa nhận chúng nếu như vấn đề đã đuwọc giải quyết. Việc thừa nhận ở đây đuwọc hiểu là hành vi xóa các thông báo. Ngay sau đó, dịch vụ của logfile chuyển sang trạng thái OK ở Nagios.
+
+> `x.x.x` là version hiện tại của cmk
+
+### Giới hạn kích thước của thông báo chưa được xác nhận
+
+Trong một số trường hợp, số lượng thông báo lỗi có thể trở nên khá lớn trong một thời gian ngắn. Để cho các trang web vẫn có thể sử dụng, logwatch check dừng để lưu thông báo lỗi mới trên máy chủ giám sát. Kích thước tối đa của logfile được đặt thành 500000 Byte. Điều này có thể được ghi đè trong tệp `main.mk` bằng cách đặt `logwatch_max_filesize` thành một số khác:
+
+`main.mk`
+```
+# Giới hạn kích thước tối đa của tin nhắn được lưu trữ trên mỗi tệp ở mức 10 KB 
+logwatch_max_filesize = 10000
+```
+
+### Thực hành
+
+Check log và báo lại mỗi lần log có từ "Remove" trong file `/var/log/messages` trên host.
+
+- Copy file plug-in mk_logwatch từ server sang host target với `scp`
+
+`scp <username>@<ip_server>:/opt/omd/versions/x.x.x/share/check_mk/agents/plugins/mk_logwatch /usr/lib/check_mk_agent/plugins`
+
+trong đó:
+
+	+ `username`: tên đăng nhập
+	
+	+ `ip_server`: ip server cmk
+	
+	+ `x.x.x`: version cmk
+
+hoặc tải xuống trực tiếp trên web ui theo đường dẫn với `wget`
+
+`wget http://ip_server/site/check_mk/agents/plugins/mk_logwatch`
+
+	+ `site`: tên site giám sát trên server
+
+nếu bạn tải xuống plug-in với wget thì hãy nhớ phân quyền cho nó:
+
+`chmod +x /usr/lib/check_mk_agent/plugins/mk_logwatch`
+
+- Tạo file cấu hình cho plug-in
+
+`vi /etc/check_mk/logwatch.cfg`
+
+nội dung file sẽ chứa đường dẫn log cần giám sát và các mẫu để lọc:
+
+```
+# Giam sat log co tu Remove
+/var/log/messages
+ W Remove*
+```
+
+ở đây tôi sẽ giám sát file log `/var/log/messages` và sẽ đặt `Warning` cho tất cả những dòng log có chứa từ "Remove"
+
+- Trên Web UI hãy truy cập `WATO - CONFIGURATION` -> `Hosts` -> `Discovery`
+
+<img src="img/290.png">
+
+chọn `Start` để tìm các services được thêm vào
+
+<img src="img/291.png">
+
+sau khi discovery xong, chọn `Back`
+
+<img src="img/292.png">
+
+active change:
+
+<img src="img/293.png">
+
+<img src="img/294.png">
+
+- Test thử plug-in bằng cách thêm 1 dòng thông báo bất kỳ có chứa "remove`
+
+sau đó quay trở lại chọn `VIEWS` -> `Hosts` -> `All hosts`
+
+<img src="img/295.png">
+
+chọn host vừa được thêm plug-in
+
+<img src="img/296.png">
