@@ -60,3 +60,117 @@ sysctl -e -p /etc/sysctl.conf
 
 #### Trên node mysql
 
+- Start và enable mariadb:
+
+```
+systemctl start mariadb
+systemctl enable mariadb
+```
+- Đặt pass cho root:
+
+`/usr/bin/mysqladmin -u root password 'password'`
+
+> thay `password` bằng password bạn muốn đặt
+
+- Tạo DB:
+
+`mysql -u root -p'password'`
+
+```
+CREATE DATABASE nagios DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'ndoutils'@'%' IDENTIFIED BY 'ndoutils_password';
+GRANT USAGE ON *.* TO 'ndoutils'@'%' IDENTIFIED BY 'ndoutils_password' WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0 ;
+GRANT ALL PRIVILEGES ON nagios.* TO 'ndoutils'@'%' WITH GRANT OPTION ;
+\q
+```
+
+> thay `ndoutils_password` bằng password của bạn
+
+- Tắt firewall:
+
+```
+systemctl stop firewalld
+systemctl disable firewalld
+```
+
+#### Cấu hình trên node Check_MK
+
+- Tải và giải nén NDO Utils v2.1.3:
+
+```
+cd /tmp
+wget https://github.com/NagiosEnterprises/ndoutils/releases/download/ndoutils-2.1.3/ndoutils-2.1.3.tar.gz
+tar xzf ndoutils-2.1.3.tar.gz
+```
+
+- Biên dịch và cài đặt NDO Utils
+
+```
+cd /tmp/ndoutils-2.1.3/
+./configure --prefix=/omd/sites/wjbu/usr/local/nagios/ --enable-mysql --with-ndo2db-user=wjbu -with-ndo2db-group=wjbu
+make all
+make install
+make install-config
+```
+
+> thay `wjbu` bằng site của bạn
+
+- Configure DB:
+
+```
+cd db
+./installdb -u 'ndoutils' -p 'ndoutils_password' -h 'ip_node_mysql' -d nagios
+cd ..
+```
+
+> thay `ip_node_mysql` bằng ip máy cài đặt mysql server
+
+`chown -R wjbu /omd/sites/wjbu/usr/local/`
+
+`su wjbu`
+
+```
+cp /tmp/ndoutils-2.1.3/src/ndomod-3x.o ~/usr/local/nagios/bin/ndomod.o
+cp /tmp/ndoutils-2.1.3/src/ndo2db-3x ~/usr/local/nagios/bin/ndo2db
+chmod 0744 ~/usr/local/nagios/bin/ndo*
+mv ~/usr/local/nagios/etc/ndo2db.cfg-sample ~/usr/local/nagios/etc/ndo2db.cfg
+mv ~/usr/local/nagios/etc/ndomod.cfg-sample ~/usr/local/nagios/etc/ndomod.cfg
+```
+
+`vi ~/usr/local/nagios/etc/ndo2db.cfg`
+
+tìm và sửa các dòng sau:
+
+```
+db_host=ip_node_mysql
+db_user=ndoutils
+db_pass=ndoutils_password
+```
+
+`exit`
+
+- Install deamon-init :
+
+`make install-init`
+
+- Thực hiện các commands sau để tạo `Broker Module`:
+
+```
+printf "\n\n# NDOUtils Broker Module\n" >> /omd/sites/wjbu/etc/nagios/nagios.cfg
+printf "broker_module=/omd/sites/wjbu/usr/local/nagios/bin/ndomod.o config_file=/omd/sites/wjbu/usr/local/nagios/etc/ndomod.cfg\n" >> /omd/sites/wjbu/etc/nagios/nagios.cfg
+```
+
+- Start và enable `ndo2db.service`:
+
+```
+systemctl enable ndo2db.service
+systemctl start ndo2db.service
+```
+
+- Restart site giám sát:
+
+`omd restart wjbu`
+
+- Kiểm tra thông tin dữ liệu được đẩy ra MySQL:
+
+`echo 'select * from nagios.nagios_logentries;' | mysql -u ndoutils -p'dsr11qaz' -h ip_node_mysql`

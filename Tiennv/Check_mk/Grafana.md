@@ -6,7 +6,7 @@ Grafana là một phần mềm phân tích và tương tác mã nguồn mở đa
 
 Là một công cụ trực quan, Grafana là một thành phần phổ biến trong các monitoring stacks, thường được sử dụng kết hợp với cơ sở dữ liệu chuỗi thời gian như Prometheus và Graphite ; các nền tảng giám sát như Sensu, Icinga, Zabbix, Netdata, và PRTG; SIEM như Elasticsearch và Splunk; và các nguồn dữ liệu khác.
 
-Grafana được phát triển bởi Grafana Labs và được xây dựng bởi ngôn ngữ lập trình Go dự trên giấy phép phép mã nguồn mở Apache 2.0
+Grafana được phát triển bởi Grafana Labs và được xây dựng bởi ngôn ngữ lập trình Go dựa trên giấy phép phép mã nguồn mở Apache 2.0
 
 ### Lịch sử phát triển
 
@@ -64,3 +64,169 @@ Phiên bản stable release mới nhất của Grafana là bản 6.6 được ph
 
 <img src="img/307.png">
 
+> Grafana là công cụ được sử dụng với nhiệm vụ chính là trực quan hoá và phân tích dữ liệu thời gian thực - tức là nó không phải đi thu thập metric từ hệ thống cần giám sát mà chỉ là công cụ để hiển thị và phân tích dữ liệu. Với giao diện đẹp mắt và nhiều tính năng tuyệt vời, Grafana được cộng đồng tin tưởng và yêu thích sử dụng.
+
+### 1 số khái nệm cơ bản
+
+- Data Source
+
+	+ Grafana hỗ trợ khá nhiều storage backend khác nhau cho dữ liệu thời gian thực. Các DS được hỗ trợ chính thức có thể kể đến như: Graphite, InfluxDB, OpenTSDB, Prometheus, Elasticsearch, CloudWatch
+	
+	+ Ngôn ngữ truy vấn và khẩ năng của mỗi DS là khác nhau. Tuy nhiên, có thể kết hợp dữ liệu từ nhiều DS khác nhau trong cùng 1 dashboard, nhưng mỗi panel thuộc về 1 DS cụ thể và thuộc về 1 tổ chức xác định
+
+- Organization
+
+	+ Grafana hỗ trợ nhiều tổ chức để hỗ trợ nhiều mô hình triển khai khác nhau, bao gồm sử dụng một Grafana instance duy nhất để cung cấp dịch vụ cho nhiều tổ chức có khả năng không tin cậy
+	
+	+ Trong hầu hết các trường hợp, Grafana được triển khai với một tổ chức duy nhất
+	
+	+ Mỗi tổ chức có thể có một hoặc nhiều DS
+	
+	+ Tất cả các dashboard được sở hữu bởi một tổ chức cụ thể
+	
+- User
+
+	+ Một người dùng là một tài khoản có tên trong Grafana. Một người dùng có thể thuộc về một hoặc nhiều tổ chức và có thể được chỉ định các cấp đặc quyền khác nhau thông qua các vai trò
+	
+	+ Grafana hỗ trợ nhiều cách bên trong và bên ngoài để người dùng tự xác thực. Chúng bao gồm từ cơ sở dữ liệu tích hợp của riêng nó, từ máy chủ SQL bên ngoài hoặc từ máy chủ LDAP bên ngoài
+
+- Panel
+
+	+ Panel là khối trực quan hoá cơ bản trong Grafana. Mỗi panel cung cấp một Query Editor (phụ thuộc vào DS được lựa chọn trong panel) cho phép bạn trích xuất trực quan hoá hoàn hảo để hiển thị trên dashboard bằng cách sử dụng Query Editor.
+
+	+ Có nhiều tuỳ chọn để tạo kiểu và định dạng mà mỗi panel hiển thị để cho phép tạo ra các hình ảnh hoàn hảo
+	
+	+ Các panel sau khi tạo có thể kéo, thả và sắp xếp lại trên dashboard, và tuỳ chỉnh kích cỡ một cách dễ dàng thông qua sử dụng chuột
+	
+	+ Hiện có các kiểu panel: Graph, Singlestat, Dashlist, Table và Text,...
+	
+	+ Các panel cũng có thể được tạo một cách linh hoạt bằng cách sử dụng các biến Dashboard Templating trong cấu hình của panel
+
+- Query Editor
+
+	+ Query Editor cho thấy khả năng của DS và cho phép truy vấn các metric mà nó chứa. Sử dụng Query Editor để dựng lên một hoặc nhiều truy vấn (cho một hoặc nhiều chuỗi dữ liệu) trong cơ sở dữ liệu thời gian thực. Panel sẽ liên tục cập nhật cho phép khám phá hiệu quả dữ liệu thời gian thực và tạo nên truy vấn hoàn hảo.
+
+	+ Ngoài ra, bạn có thể sử dụng Template variables trong Query Editor để tự truy vấn chúng. Điều này cung cấp một cách mạnh mẽ để khám phá dữ liệu tự động dựa trên các biến Templating được chọn từ dashboard
+
+	+ Grafana cho phép tham chiếu các truy vấn trong Query Editor tại các dòng. Nếu bạn thêm truy vấn thứ 2 vào đồ thị, bạn có thể tham chiếu tới truy vấn thứ nhất bằng cách gõ #A. Đây là cách cung cấp sự hiệu quả và dễ dàng để xây dựng nên các truy vấn phức tạp
+	
+- Dashboard
+
+	+ Dashboard là nơi mọi thứ kết hợp với nhau. Dashboard có thể được xem như là tập hợp của một hoặc nhiều Panel được tổ chức và sắp xếp thành một hoặc nhiều hàng
+	
+	+ Trên giao diện Dashboard, bạn có thể điều khiển chu kì thời gian cập nhật metric, sử dụng các Templating tương tác một cách tự động, sử dụng Annotations để tạo chú thích cho các sự kiện trên panel
+	
+	+ Dashboard (hoặc một panel cụ thể) có thể được chia sẻ dễ dàng bằng nhiều cách. Bạn có thể gửi link tới những người có thể đăng nhập được vào Grafana
+
+### Cấu hình
+
+- Thêm repo Grafana:
+
+```
+cat > /etc/yum.repos.d/grafana.repo <<\EOF
+[grafana]
+name=grafana
+baseurl=https://packages.grafana.com/oss/rpm
+repo_gpgcheck=1
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.grafana.com/gpg.key
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+EOF
+```
+
+- Cài đặt Grafana:
+
+`yum install -y grafana`
+
+- Start và enable Grafana:
+
+```
+systemctl daemon-reload
+systemctl start grafana-server
+systemctl status grafana-server
+```
+
+- Add port trên firewall
+
+```
+firewall-cmd --add-port=3000/tcp --permanent
+firewall-cmd --reload
+```
+
+Truy cập vào `ip-server:3000` để kiểm tra và đăng nhập với tài khoản / mật khẩu là admin/admin.
+
+- Cài đặt plugin `SimpleJson` trên Grafana-server và khởi động lại Grafana-server:
+
+```
+grafana-cli plugins install grafana-simple-json-datasource
+systemctl restart grafana-server
+```
+
+- Cài đặt rrdtool server:
+
+`yum install -y rrdtool-devel`
+
+- Cài đặt golang:
+
+`yum install -y golang golang-go`
+
+- Tạo `GOPATH` và thiết lập biến môi trường:
+
+```
+mkdir ~/.go
+export GOPATH=$HOME/.go
+```
+
+- Get package grafana-rrd-server:
+
+```
+yum install -y git
+go get github.com/doublemarket/grafana-rrd-server
+```
+
+- Khởi chạy grafana-rrd-server:
+
+```
+cd ~/.go/bin/
+./grafana-rrd-server -s 300 -r /opt/omd/sites/wjbu/var/pnp4nagios/perfdata
+```
+
+> thay `wjbu` bằng tên site của bạn
+
+- Truy cập vào grafana `ip-grafana-server:3000` và thêm vào datasource như sau:
+
+<img src="img/308.png">
+
+chọn `Add data source`
+
+kéo thanh cuộn xuống dưới và chọn `SimpleJson`
+
+<img src="img/309.png">
+
+điền các thông tin và chọn `Save & Test`
+
+<img src="img/310.png">
+
+- Tạo biểu đồ test xem data đã được đẩy hay chưa
+
+sau khi add data source, quay trở lại trang chính và chọn `New dashboard`
+
+<img src="img/311.png">
+
+chọn `Add Query`
+
+<img src="img/312.png">
+
+ở mục `Query` chọn tên của data source vừa tạo
+
+<img src="img/313.png">
+
+thêm dữ liệu để query vào và save lại
+
+<img src="img/314.png">
+
+Dashboard sau khi add vào
+
+<img src="img/315.png">
