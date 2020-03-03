@@ -1,0 +1,33 @@
+#!/bin/bash
+#Written by wjbu Thanh ai đồ du tu be
+
+#Duong dan den file log - thay bang duong dan den file log cua ban | Path to log file - replace with the path to your log file
+FILE_PATH=/tmp/test
+
+#Dem so dong trong file log | Count the number of lines in the log file
+grep -c ^ $FILE_PATH >> /tmp/output
+
+#check
+CHECK2=`tail -n1 /tmp/output`
+
+CHECK1=`tail -n2 /tmp/output | head -n1`
+
+result=`expr $CHECK2 - $CHECK1`
+
+#So sanh | compare
+if [ "$result" -eq "0" ]
+then
+echo "0 CheckLogLine - OK - khong co log duoc them vao"
+exit 0
+elif ((1<=$result && $result<=9))
+then
+echo "1 CheckLogLine - Warning - co $result dong log duoc them vao"
+exit 1
+elif ((10<=$result))
+then
+echo "2 CheckLogLine - Critical - co $result dong log duoc them vao"
+exit 2
+else
+echo "3 CheckLogLine - Unknown - khong xac dinh"
+exit 3
+fi
