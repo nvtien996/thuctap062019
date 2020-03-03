@@ -85,10 +85,6 @@ Có thể cài theo hướng dẫn [này](https://github.com/nvtien996/thuctap06
 
 - Điền các thông tin và lưu lại:
 
-<img src="img/320.png">
-
-trong đó:
-
 	+ `Description`: Mô tả service
 
 	+ `Service description` Tên hiển thị của service
@@ -98,6 +94,8 @@ trong đó:
 	`check_mysql_health --hostname $HOSTADDRESS$ --username checker --password password_checker --mode connection-time --warning 3 --critical 5`
 	
 	+ `Performance data`: Cho phép Check_mk xử lý, phân tích dữ liệu thu thập được
+
+<img src="img/320.png">
 
 - Kích hoạt các thay đổi vừa lưu:
 
