@@ -4,15 +4,15 @@ Checkmk có cấu trúc mô đun cơ bản và nhiều thành phần của nó c
 
 Bạn có thể mở rộng Checkmk với các yếu tố sau:
 
-	+ Own checks và agent plug-ins, kể cả input masks cho WATO
+- Own checks và agent plug-ins, kể cả input masks cho WATO
 	
-	+ Own plug-ins cho [Checkmk Inventory](https://checkmk.com/cms_inventory.html)
+- Own plug-ins cho [Checkmk Inventory](https://checkmk.com/cms_inventory.html)
 	
-	+ Các tiện ích mở rộng cho GUI (views, dashboards, columns, icons, v.v.)
+- Các tiện ích mở rộng cho GUI (views, dashboards, columns, icons, v.v.)
 	
-	+ Định nghĩa đồ thị hoặc Perf-O-Meters
+- Định nghĩa đồ thị hoặc Perf-O-Meters
 	
-	+ Các script cảnh báo và xử lý cảnh báo (bằng Shell hoặc bất kì loại ngôn ngữ script nào)
+- Các script cảnh báo và xử lý cảnh báo (bằng Shell hoặc bất kì loại ngôn ngữ script nào)
 
 Tất cả các tiện ích mở rộng này được triển khai bằng cách lưu trữ các tệp trong thư mục `~/local` trong Checkmk instance. Để quản lý các tiện ích mở rộng này một cách hiệu quả, để triển khai chúng trong các môi trường phân tán và cũng để chia sẻ chúng với những người dùng khác, Checkmk cung cấp định dạng gói riêng của nó: gọi tắt là MKP - Checkmk Extension Package (Gói mở rộng Checkmk).
 
@@ -26,9 +26,9 @@ Trên [Checkmk Exchange](https://checkmk.com/check_mk-exchange.php?), người d
 
 Có hai công cụ để quản lý MKP:
 
-	+ Lệnh `mkp` được nhập từ dòng lệnh
+- Lệnh `mkp` được nhập từ dòng lệnh
 	
-	+ Extension Packages WATO module (chỉ có ở phiên bản Enterprise Editions - nghĩa là các bản CFE, CEE hoặc CME)
+- Extension Packages WATO module (chỉ có ở phiên bản Enterprise Editions - nghĩa là các bản CFE, CEE hoặc CME)
 
 ### Quản lý các gói mở rộng thông qua WATO
 

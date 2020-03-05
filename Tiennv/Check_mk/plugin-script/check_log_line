@@ -1,5 +1,6 @@
 #!/bin/bash
-#Written by wjbu Thanh ai đồ du tu be
+
+#Written by wjbu Thanh ai do du tu be
 
 #Duong dan den file log - thay bang duong dan den file log cua ban | Path to log file - replace with the path to your log file
 FILE_PATH=/tmp/test
