@@ -12,7 +12,7 @@ MySQL là một hệ thống quản trị cơ sở dữ liệu mã nguồn mở 
 
 Quá trình hình thành và phát triển của MySQL được tóm tắt như sau:
 
-Công ty Thuy Điển MySQL AB phát triển MySQL vào năm 1994.
+Công ty Thụy Điển MySQL AB phát triển MySQL vào năm 1994.
 
 Phiên bản đầu tiên của MySQL phát hành năm 1995
 
@@ -173,4 +173,95 @@ systemctl start ndo2db.service
 
 - Kiểm tra thông tin dữ liệu được đẩy ra MySQL:
 
-`echo 'select * from nagios.nagios_logentries;' | mysql -u ndoutils -p'dsr11qaz' -h ip_node_mysql`
+`echo 'select * from nagios.nagios_logentries;' | mysql -u ndoutils -p'ndoutils_password' -h 192.168.20.82`
+
+### Data Processing Options
+
+Các  NDOUtils NDOMOD broker module có thể được cấu hình để chỉ xử lý một số loại dữ liệu. Điều này được định nghĩa trong tệp `ndomod.cfg`.
+
+Tệp tin `ndomod.cfg` như trong bài này có đường dẫn là `/opt/omd/sites/wjbu/usr/local/nagios/etc/ndomod.cfg`
+
+Với những phiên bản Nagios đầu tiên, các tùy chọn khác nhau đã được xác định bằng cách tính toán bitmask và được xác định với:
+
+`data_processing_options=xxxx`
+
+trong đó `xxxx` là số bitmask.
+
+Và để tính toán số bitmask, ta sẽ cần giá trị của các tùy chọn sau:
+
+```
+NDOMOD_PROCESS_PROCESS_DATA	1
+NDOMOD_PROCESS_TIMED_EVENT_DATA	2
+NDOMOD_PROCESS_LOG_DATA						   4
+NDOMOD_PROCESS_SYSTEM_COMMAND_DATA			   8
+NDOMOD_PROCESS_EVENT_HANDLER_DATA			  16
+NDOMOD_PROCESS_NOTIFICATION_DATA			  32
+NDOMOD_PROCESS_SERVICE_CHECK_DATA			  64
+NDOMOD_PROCESS_HOST_CHECK_DATA				 128
+NDOMOD_PROCESS_COMMENT_DATA					 256
+NDOMOD_PROCESS_DOWNTIME_DATA				 512
+NDOMOD_PROCESS_FLAPPING_DATA				1024
+NDOMOD_PROCESS_PROGRAM_STATUS_DATA			2048
+NDOMOD_PROCESS_HOST_STATUS_DATA				4096
+NDOMOD_PROCESS_SERVICE_STATUS_DATA			8192
+NDOMOD_PROCESS_ADAPTIVE_PROGRAM_DATA	   16384
+NDOMOD_PROCESS_ADAPTIVE_HOST_DATA		   32768
+NDOMOD_PROCESS_ADAPTIVE_SERVICE_DATA	   65536
+NDOMOD_PROCESS_EXTERNAL_COMMAND_DATA	  131072
+NDOMOD_PROCESS_OBJECT_CONFIG_DATA		  262144
+NDOMOD_PROCESS_MAIN_CONFIG_DATA			  524288
+NDOMOD_PROCESS_AGGREGATED_STATUS_DATA	 1048576
+NDOMOD_PROCESS_RETENTION_DATA			 2097152
+NDOMOD_PROCESS_ACKNOWLEDGEMENT_DATA		 4194304
+NDOMOD_PROCESS_STATE_CHANGE_DATA		 8388608
+NDOMOD_PROCESS_CONTACT_STATUS_DATA		16777216
+NDOMOD_PROCESS_ADAPTIVE_CONTACT_DATA	33554432
+```
+
+Ví dụ: trong Nagios XI, bitmask của 67108669 được sử dụng bao gồm tất cả các tùy chọn này EXCEPT cho NDOMOD_PROCESS_TIMED_EVENT_DATA, NDOMOD_PROCESS_HOST_CHECK_DATA và NDOMOD_PROCESS_SERVICE
+
+`data_processing_options=67108669`
+
+Nhưng kể từ ndoutils2.x, các tùy chọn này có thể được xác định riêng lẻ thay vì sử dụng `data_processing_options`
+
+Hãy thêm ký tự `#` ở phía trước dòng `data_processing_options` (nếu có).
+
+Bây giờ dán đoạn sau vào tệp (sau dòng bạn vừa thêm `#`):
+
+```
+acknowledgement_data=1
+adaptive_contact_data=1
+adaptive_host_data=1
+adaptive_program_data=1
+adaptive_service_data=1
+aggregated_status_data=1
+comment_data=1
+contact_status_data=1
+downtime_data=1
+event_handler_data=1
+external_command_data=1
+flapping_data=1
+host_check_data=0
+host_status_data=1
+log_data=1
+main_config_data=1
+notification_data=1
+object_config_data=1
+process_data=1
+program_status_data=1
+retention_data=1
+service_check_data=0
+service_status_data=1
+statechange_data=1
+system_command_data=1
+timed_event_data=0
+```
+
+Lưu lại file.
+
+Restart lại ndo2db service và site giám sát:
+
+```
+systemctl restart ndo2db.service
+omd restart wjbu
+```
