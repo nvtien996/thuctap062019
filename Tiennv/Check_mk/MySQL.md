@@ -192,29 +192,29 @@ Và để tính toán số bitmask, ta sẽ cần giá trị của các tùy ch�
 ```
 NDOMOD_PROCESS_PROCESS_DATA	1
 NDOMOD_PROCESS_TIMED_EVENT_DATA	2
-NDOMOD_PROCESS_LOG_DATA						   4
-NDOMOD_PROCESS_SYSTEM_COMMAND_DATA			   8
-NDOMOD_PROCESS_EVENT_HANDLER_DATA			  16
-NDOMOD_PROCESS_NOTIFICATION_DATA			  32
-NDOMOD_PROCESS_SERVICE_CHECK_DATA			  64
-NDOMOD_PROCESS_HOST_CHECK_DATA				 128
-NDOMOD_PROCESS_COMMENT_DATA					 256
-NDOMOD_PROCESS_DOWNTIME_DATA				 512
-NDOMOD_PROCESS_FLAPPING_DATA				1024
-NDOMOD_PROCESS_PROGRAM_STATUS_DATA			2048
-NDOMOD_PROCESS_HOST_STATUS_DATA				4096
-NDOMOD_PROCESS_SERVICE_STATUS_DATA			8192
-NDOMOD_PROCESS_ADAPTIVE_PROGRAM_DATA	   16384
-NDOMOD_PROCESS_ADAPTIVE_HOST_DATA		   32768
-NDOMOD_PROCESS_ADAPTIVE_SERVICE_DATA	   65536
-NDOMOD_PROCESS_EXTERNAL_COMMAND_DATA	  131072
-NDOMOD_PROCESS_OBJECT_CONFIG_DATA		  262144
-NDOMOD_PROCESS_MAIN_CONFIG_DATA			  524288
-NDOMOD_PROCESS_AGGREGATED_STATUS_DATA	 1048576
-NDOMOD_PROCESS_RETENTION_DATA			 2097152
-NDOMOD_PROCESS_ACKNOWLEDGEMENT_DATA		 4194304
-NDOMOD_PROCESS_STATE_CHANGE_DATA		 8388608
-NDOMOD_PROCESS_CONTACT_STATUS_DATA		16777216
+NDOMOD_PROCESS_LOG_DATA	4
+NDOMOD_PROCESS_SYSTEM_COMMAND_DATA	8
+NDOMOD_PROCESS_EVENT_HANDLER_DATA	16
+NDOMOD_PROCESS_NOTIFICATION_DATA	32
+NDOMOD_PROCESS_SERVICE_CHECK_DATA	64
+NDOMOD_PROCESS_HOST_CHECK_DATA	128
+NDOMOD_PROCESS_COMMENT_DATA	256
+NDOMOD_PROCESS_DOWNTIME_DATA	512
+NDOMOD_PROCESS_FLAPPING_DATA	1024
+NDOMOD_PROCESS_PROGRAM_STATUS_DATA	2048
+NDOMOD_PROCESS_HOST_STATUS_DATA	4096
+NDOMOD_PROCESS_SERVICE_STATUS_DATA	8192
+NDOMOD_PROCESS_ADAPTIVE_PROGRAM_DATA	16384
+NDOMOD_PROCESS_ADAPTIVE_HOST_DATA	32768
+NDOMOD_PROCESS_ADAPTIVE_SERVICE_DATA	65536
+NDOMOD_PROCESS_EXTERNAL_COMMAND_DATA	131072
+NDOMOD_PROCESS_OBJECT_CONFIG_DATA	262144
+NDOMOD_PROCESS_MAIN_CONFIG_DATA	524288
+NDOMOD_PROCESS_AGGREGATED_STATUS_DATA	1048576
+NDOMOD_PROCESS_RETENTION_DATA	2097152
+NDOMOD_PROCESS_ACKNOWLEDGEMENT_DATA	4194304
+NDOMOD_PROCESS_STATE_CHANGE_DATA	8388608
+NDOMOD_PROCESS_CONTACT_STATUS_DATA	16777216
 NDOMOD_PROCESS_ADAPTIVE_CONTACT_DATA	33554432
 ```
 
@@ -259,9 +259,62 @@ timed_event_data=0
 
 Lưu lại file.
 
+Do ở đây tôi chỉ quan tâm đến các dữ liệu liên quan đến host và service nên tôi chỉ cần các tùy chọn như sau:
+
+```
+adaptive_host_data=1
+adaptive_service_data=1
+host_check_data=1
+host_status_data=1
+log_data=1
+service_check_data=1
+service_status_data=1
+```
+
 Restart lại ndo2db service và site giám sát:
 
 ```
 systemctl restart ndo2db.service
 omd restart wjbu
+```
+
+### Thời gian lưu trữ trong database table
+
+Một số bảng cơ sở dữ liệu chứa dữ liệu sự kiện Nagios có thể lớn dần theo thời gian. Hầu hết các quản trị viên sẽ muốn sắp xếp lại các bảng này và chỉ giữ một lượng dữ liệu nhất định trong đó. Các tùy chọn bên dưới được sử dụng để chỉ định thời gian (tính bằng PHÚT) dữ liệu sẽ được cho phép lưu lại trong các bảng khác nhau trước khi bị xóa. Sử dụng giá trị `0` cho bất kỳ giá trị nào có nghĩa là bảng cụ thể đó KHÔNG được tự động dọn dẹp.
+
+Các tùy chọn bên dưới sẽ được lưu trong tệp `/opt/omd/sites/wjbu/usr/local/nagios/etc/ndo2db.cfg` như bên trên đã cấu hình
+
+```
+# Keep timed events for 24 hours
+max_timedevents_age=1440
+
+# Keep system commands for 1 week
+max_systemcommands_age=10080
+
+# Keep service checks for 1 week
+max_servicechecks_age=10080
+
+# Keep host checks for 1 week
+max_hostchecks_age=10080
+
+# Keep event handlers for 31 days
+max_eventhandlers_age=44640
+
+# Keep external commands for 31 days
+max_externalcommands_age=44640
+
+# Keep notifications for 31 days
+max_notifications_age=44640
+
+# Keep contactnotifications for 31 days
+max_contactnotifications_age=44640
+
+# Keep contactnotificationmethods for 31 days
+max_contactnotificationmethods_age=44640
+
+# Keep logentries for 90 days
+max_logentries_age=129600
+
+# Keep acknowledgements for 31 days
+max_acknowledgements_age=44640
 ```
