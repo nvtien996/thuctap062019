@@ -12,7 +12,7 @@ Khi bạn có 1 trang web với số lượng lớn lượt truy cập, số lư
 
 Đồng thời, máy chủ CSDL cũng phải ghi lại dữ liệu vào các bảng, vì vậy nó phải thực hiện các hoạt động đồng thời đọc/ghi. Đây sẽ là nơi cần phải phân cụnm máy chủ CSDL.
 
-Nói cách khác, trong phân cụm CSDL, có 1 nhóm máy chủ để xử lý công việc chứ không phải chỉ là 1 máy chủ. Do đó nó có thể cung cấp dự phòng dữ liệu, cũng như tính cân bằng tải. Ngaoì ra điều này còn làm cho ứng dụng web có tính sẵn sàng cao.
+Nói cách khác, trong phân cụm CSDL, có 1 nhóm máy chủ để xử lý công việc chứ không phải chỉ là 1 máy chủ. Do đó nó có thể cung cấp dự phòng dữ liệu, cũng như tính cân bằng tải. Ngoài ra điều này còn làm cho ứng dụng web có tính sẵn sàng cao.
 
 Tuy nhiên, không có 1 giải pháp nào phù hợp cho tất cả đối với CSDL clustering. Nó phụ thuộc phần lớn vào loại ứng dụng web, số lượng đọc/ghi vào CSDL, loại nội dung, v.v.
 
