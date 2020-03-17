@@ -2,7 +2,7 @@
 
 ### Tổng quan
 
-MariaDB là một sản phẩm mã đóng tách ra từ mã mở do cộng đồng phát triển của hệ quản trị cơ sở dữ liệu quan hệ MySQL nhằm theo hướng không phải trả phí với GNU GPL. MariaDB được phát triển từ sự dẫn dắt của những nhà phát triển ban đầu của MySQL, do lo ngại khi MySQL bị Oracle Corporation mua lại. Những người đóng góp được yêu cầu chia sẻ quyền tác giả của họ với MariaDB Foundation.
+MariaDB là 1 sản phẩm được tách ra từ mã mở do cộng đồng phát triển của hệ quản trị cơ sở dữ liệu quan hệ MySQL nhằm theo hướng không phải trả phí với GNU GPL. MariaDB được phát triển từ sự dẫn dắt của những nhà phát triển ban đầu của MySQL, do lo ngại khi MySQL bị Oracle Corporation mua lại. Những người đóng góp được yêu cầu chia sẻ quyền tác giả của họ với MariaDB Foundation.
 
 MariaDB được định hướng để duy trì khả năng tương thích cao với MySQL, để đảm bảo khả năng hỗ trợ về thư viện đồng thời kết hợp một cách tốt nhất với các API và câu lệnh của MySQL. MariaDB đã có công cụ hỗ lưu trữ XtraDB thay cho InnoDB.
 
@@ -200,7 +200,7 @@ systemctl enable mariadb
 
 - Kiểm tra tại node1
 
-`mysql -u root -e "SHOW STATUS LIKE 'wsrep_cluster_size'"`
+`mysql -u root -p -e "SHOW STATUS LIKE 'wsrep_cluster_size'"`
 
 <img src="img/01.png">
 
