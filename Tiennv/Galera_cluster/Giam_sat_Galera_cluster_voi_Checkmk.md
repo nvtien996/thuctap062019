@@ -182,7 +182,9 @@ Khi node trả về giá trị 0,0, nó chỉ ra rằng node không tạm dừng
 
 Lý tưởng nhất là giá trị trả về phải càng gần 0,0 càng tốt. Trong trường hợp node đang tạm dừng thường xuyên, có thể điều chỉnh tham số `wsrep_slave_threads` hoặc có thể loại trừ node khỏi cluster.
 
+- Cuối cùng là `Active Change` và discovery lại các host/service.
+
 ---
 
 > tham khảo: https://github.com/kriegerse/check_mk-mysql_galera_cluster
-https://github.com/trangnth/Monitor/blob/master/Ghichep_omd/Check_MK%20Check%20galera.md
+> https://github.com/trangnth/Monitor/blob/master/Ghichep_omd/Check_MK%20Check%20galera.md
