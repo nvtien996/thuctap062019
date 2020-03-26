@@ -186,5 +186,8 @@ Lý tưởng nhất là giá trị trả về phải càng gần 0,0 càng tốt
 
 ---
 
-> tham khảo: https://github.com/kriegerse/check_mk-mysql_galera_cluster
-> https://github.com/trangnth/Monitor/blob/master/Ghichep_omd/Check_MK%20Check%20galera.md
+> tham khảo:
+
+https://github.com/kriegerse/check_mk-mysql_galera_cluster
+
+https://github.com/trangnth/Monitor/blob/master/Ghichep_omd/Check_MK%20Check%20galera.md
